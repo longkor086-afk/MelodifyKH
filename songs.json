@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "title": "បទឧទាហរណ៍ ១",
+    "artist": "អ្នកចម្រៀង A",
+    "album": "អាល់ប៊ុម ១",
+    "url": "https://example.com/songs/song1.mp3",
+    "cover": "https://example.com/covers/cover1.jpg",
+    "addedDate": "2024-01-01"
+  },
+  {
+    "id": "2",
+    "title": "បទឧទាហរណ៍ ២",
+    "artist": "អ្នកចម្រៀង B",
+    "album": "អាល់ប៊ុម ២",
+    "url": "https://example.com/songs/song2.mp3",
+    "cover": "https://example.com/covers/cover2.jpg",
+    "addedDate": "2024-01-02"
+  }
+]
