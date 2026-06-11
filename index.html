@@ -11,7 +11,26 @@
             padding: 0;
             box-sizing: border-box;
         }
+.refresh-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 8px;
+    transition: 0.3s;
+}
 
+.refresh-btn:hover {
+    background: var(--accent);
+}
+
+.refresh-btn:active {
+    transform: rotate(180deg);
+    transition: 0.5s;
+    }
         :root {
             --bg-primary: #121212;
             --bg-secondary: #1e1e1e;
@@ -508,12 +527,13 @@
 <body>
     <div class="app-container">
         <div class="header">
-            <div class="logo">🎵 Melodify</div>
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="ស្វែងរកបទចម្រៀង..." oninput="searchSongs()">
-            </div>
-            <button class="admin-btn" onclick="showAdmin()">⚙️</button>
-        </div>
+    <div class="logo">🎵 Melodify</div>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="ស្វែងរកបទចម្រៀង..." oninput="searchSongs()">
+    </div>
+    <button class="refresh-btn" onclick="refreshSongs()" title="ផ្ទុកទិន្នន័យថ្មី">🔄</button>
+    <button class="admin-btn" onclick="showAdmin()">⚙️</button>
+</div>
 
         <div class="tabs" id="tabs">
             <button class="tab active" onclick="switchTab('all')">ទាំងអស់</button>
@@ -663,21 +683,32 @@
 
         // Load songs from GitHub
         async function loadSongs() {
-            try {
-                const response = await fetch(GITHUB_RAW_URL + 'songs.json?' + new Date().getTime());
-                if (!response.ok) throw new Error('Failed to fetch');
-                songs = await response.json();
-            } catch (error) {
-                console.error('Error loading from GitHub:', error);
-                // Fallback to localStorage
-                const localSongs = localStorage.getItem('songs_backup');
-                if (localSongs) {
-                    songs = JSON.parse(localSongs);
-                }
+    try {
+        // បន្ថែម cache buster ខ្លាំងជាងមុន
+        const cacheBuster = '?v=' + Date.now() + '&r=' + Math.random();
+        const response = await fetch(GITHUB_RAW_URL + 'songs.json' + cacheBuster, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
             }
-            updatePlaylist();
-            renderSongs();
-            updateAdminSongList();
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch');
+        songs = await response.json();
+        console.log('✅ បានផ្ទុកបទចម្រៀង ' + songs.length + ' បទ');
+    } catch (error) {
+        console.error('Error loading from GitHub:', error);
+        // ព្យាយាមផ្ទុកពី localStorage វិញ
+        const localSongs = localStorage.getItem('songs_backup');
+        if (localSongs) {
+            songs = JSON.parse(localSongs);
+            console.log('📦 ប្រើទិន្នន័យក្នុង LocalStorage');
+        }
+    }
+    updatePlaylist();
+    renderSongs();
+    updateAdminSongList();
         }
 
         function updatePlaylist() {
@@ -1110,8 +1141,26 @@
             link.href = song.url;
             link.download = `${song.title} - ${song.artist}.mp3`;
             link.click();
+        
         }
-
+        }async       } function refreshSongs() {
+    const refreshBtn = document.querySelector('.refresh-btn');
+    refreshBtn.style.transform = 'rotate(360deg)';
+    
+    // បង្ហាញការផ្ទុក
+    const songList = document.getElementById('songList');
+    songList.innerHTML = '<div style="text-align: center; padding: 40px;">🔄 កំពុងផ្ទុកទិន្នន័យថ្មី...</div>';
+    
+    // ផ្ទុកទិន្នន័យថ្មី
+    await loadSongs();
+    
+    // ត្រឡប់ប៊ូតុងមកធម្មតាវិញ
+    setTimeout(() => {
+        refreshBtn.style.transform = 'rotate(0deg)';
+    }, 500);
+    
+    console.log('🔄 បានផ្ទុកទិន្នន័យឡើងវិញ');
+        }
         function shareCurrentSong() {
             if (currentSongIndex === -1) return;
             shareSong(currentSongIndex);
