@@ -1338,18 +1338,19 @@
         }
 
         function playSong(song) {
-            if (!song || !song.url) {
-                showToast('❌ បទនេះគ្មាន URL', 'error');
-                return;
-            }
+    if (!song || !song.file_id) {
+        showToast('❌ បទនេះគ្មាន File ID', 'error');
+        return;
+    }
 
-            audio.src = song.url;
-            audio.play().catch(e => {
-                console.log('Play error:', e);
-                showToast('❌ មិនអាចចាក់បទនេះបាន សូមព្យាយាមម្តងទៀត', 'error');
-            });
+    audio.src = "https://melodify-api-2mag.onrender.com/song/" + song.file_id;
 
-            updateNowPlayingBar();
+    audio.play().catch(e => {
+        console.log('Play error:', e);
+        showToast('❌ មិនអាចចាក់បទនេះបាន សូមព្យាយាមម្តងទៀត', 'error');
+    });
+    
+        updateNowPlayingBar();
             document.getElementById('nowPlayingBar').style.display = 'flex';
 
             // Update full player
