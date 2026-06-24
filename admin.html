@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MelodifyKH - Admin Panel</title>
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent: #7c3aed;
+            --accent-hover: #6d28d9;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --success: #10b981;
+            --border: #2a2a2a;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .login-logo {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #8b5cf6, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 14px;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        /* Admin Dashboard */
+        .admin-container {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .admin-logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: 1px solid var(--border);
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .song-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            gap: 12px;
+            transition: background 0.2s;
+        }
+
+        .song-item:hover {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .song-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .song-item-title {
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-item-artist {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .song-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: var(--accent);
+        }
+
+        .btn-delete {
+            background: var(--danger);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 2000;
+            font-size: 14px;
+            color: white;
+            box-shadow: var(--shadow);
+            animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.5s forwards;
+        }
+
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">🎵</div>
+            <div class="login-title">MelodifyKH Admin</div>
+            <div class="login-subtitle">ចូលប្រើប្រព័ន្ធគ្រប់គ្រង</div>
+            <div class="form-group">
+                <label class="form-label">ឈ្មោះអ្នកប្រើ</label>
+                <input type="text" class="form-input" id="username" placeholder="បញ្ចូលឈ្មោះ...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">ពាក្យសម្ងាត់</label>
+                <input type="password" class="form-input" id="password" placeholder="បញ្ចូលពាក្យសម្ងាត់...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">GitHub Token</label>
+                <input type="password" class="form-input" id="githubToken" placeholder="ghp_xxxxxxxxxxxx...">
+            </div>
+            <button class="btn btn-primary" id="loginBtn">ចូលប្រើ</button>
+            <div class="error-msg" id="loginError">ឈ្មោះ ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ</div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-container" id="adminDashboard">
+        <div class="admin-header">
+            <div class="admin-logo">🎵 MelodifyKH Admin</div>
+            <button class="logout-btn" id="logoutBtn">ចាកចេញ</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats" style="margin-bottom: 24px;">
+            <div class="stat-card">
+                <div class="stat-value" id="songCount">0</div>
+                <div class="stat-label">បទចម្រៀងសរុប</div>
+            </div>
+        </div>
+
+        <!-- Add Song -->
+        <div class="section">
+            <div class="section-title">➕ បន្ថែមបទថ្មី</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">ចំណងជើង</label>
+                    <input type="text" class="form-input" id="addTitle" placeholder="ចំណងជើងបទ...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">សិល្បករ</label>
+                    <input type="text" class="form-input" id="addArtist" placeholder="ឈ្មោះសិល្បករ...">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">File ID (Telegram)</label>
+                    <input type="text" class="form-input" id="addFileId" placeholder="file_id...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cover Image URL</label>
+                    <input type="text" class="form-input" id="addCover" placeholder="https://...">
+                </div>
+            </div>
+            <button class="btn btn-primary" id="addSongBtn">➕ បន្ថែមបទ</button>
+        </div>
+
+        <!-- Song List -->
+        <div class="section">
+            <div class="section-title">📋 បញ្ជីចម្រៀង</div>
+            <div class="song-list" id="adminSongList">
+                <div style="text-align: center; padding: 20px; color: var(--text-secondary);">កំពុងទាញទិន្នន័យ...</div>
+            </div>
+        </div>
+
+        <!-- Save to GitHub -->
+        <div style="text-align: center; padding: 20px;">
+            <button class="btn btn-success" id="saveToGitHub">💾 រក្សាទុកទៅ GitHub</button>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 3000; align-items: center; justify-content: center;">
+        <div style="background: var(--bg-card); border-radius: 16px; padding: 24px; width: 90%; max-width: 500px; border: 1px solid var(--border);">
+            <div class="section-title">✏️ កែសម្រួលបទ</div>
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label class="form-label">ចំណងជើង</label>
+                <input type="text" class="form-input" id="editTitle">
+            </div>
+            <div class="form-group">
+                <label class="form-label">សិល្បករ</label>
+                <input type="text" class="form-input" id="editArtist">
+            </div>
+            <div class="form-group">
+                <label class="form-label">File ID</label>
+                <input type="text" class="form-input" id="editFileId">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cover URL</label>
+                <input type="text" class="form-input" id="editCover">
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-primary" id="saveEditBtn">រក្សាទុក</button>
+                <button class="btn btn-secondary" id="cancelEditBtn">បោះបង់</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== Admin App ====================
+        const ADMIN_CREDENTIALS = {
+            username: 'admin',
+            password: 'melodifykh2024'
+        };
+
+        const GITHUB_CONFIG = {
+            repo: 'YOUR_GITHUB_USERNAME/melodifykh',
+            branch: 'main',
+            path: 'songs.json'
+        };
+
+        let songs = [];
+        let githubToken = '';
+        let isLoggedIn = false;
+
+        // DOM Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const adminDashboard = document.getElementById('adminDashboard');
+        const loginError = document.getElementById('loginError');
+        const editModal = document.getElementById('editModal');
+
+        // ==================== Auth ====================
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const token = document.getElementById('githubToken').value.trim();
+
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+                    loginError.textContent = 'សូមបញ្ចូល GitHub Token ត្រឹមត្រូវ (ghp_...)';
+                    loginError.classList.add('show');
+                    return;
+                }
+                githubToken = token;
+                isLoggedIn = true;
+                loginScreen.style.display = 'none';
+                adminDashboard.style.display = 'block';
+                loginError.classList.remove('show');
+                loadSongs();
+                showToast('ចូលប្រើបានជោគជ័យ!', 'success');
+            } else {
+                loginError.textContent = 'ឈ្មោះ ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ';
+                loginError.classList.add('show');
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            isLoggedIn = false;
+            githubToken = '';
+            songs = [];
+            adminDashboard.style.display = 'none';
+            loginScreen.style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('githubToken').value = '';
+        });
+
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('loginBtn').click();
+        });
+
+        // ==================== Load Songs ====================
+        async function loadSongs() {
+            try {
+                const response = await fetch('songs.json?' + Date.now());
+                if (response.ok) {
+                    songs = await response.json();
+                } else {
+                    songs = [];
+                }
+                renderSongList();
+                updateStats();
+            } catch (error) {
+                console.error('Load error:', error);
+                songs = [];
+                renderSongList();
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('songCount').textContent = songs.length;
+        }
+
+        function renderSongList() {
+            const container = document.getElementById('adminSongList');
+            if (songs.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-secondary);">គ្មានបទចម្រៀងទេ</div>';
+                return;
+            }
+
+            container.innerHTML = songs.map((song, index) => `
+                <div class="song-item">
+                    <div class="song-item-info">
+                        <div class="song-item-title">${song.title || 'គ្មានចំណងជើង'}</div>
+                        <div class="song-item-artist">${song.artist || 'មិនស្គាល់'} | ID: ${song.id}</div>
+                    </div>
+                    <div class="song-item-actions">
+                        <button class="btn-sm btn-edit" onclick="openEditModal(${index})">✏️</button>
+                        <button class="btn-sm btn-delete" onclick="deleteSong(${index})">🗑</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== Add Song ====================
+        document.getElementById('addSongBtn').addEventListener('click', () => {
+            const title = document.getElementById('addTitle').value.trim();
+            const artist = document.getElementById('addArtist').value.trim();
+            const fileId = document.getElementById('addFileId').value.trim();
+            const cover = document.getElementById('addCover').value.trim();
+
+            if (!title || !artist || !fileId) {
+                showToast('សូមបំពេញព័ត៌មានចាំបាច់ (ចំណងជើង, សិល្បករ, File ID)', 'error');
+                return;
+            }
+
+            const newSong = {
+                id: 'song_' + Date.now(),
+                title: title,
+                artist: artist,
+                file_id: fileId,
+                cover: cover || '',
+                addedAt: new Date().toISOString()
+            };
+
+            songs.push(newSong);
+            renderSongList();
+            updateStats();
+            clearAddForm();
+            showToast('បានបន្ថែមបទថ្មី!', 'success');
+        });
+
+        function clearAddForm() {
+            document.getElementById('addTitle').value = '';
+            document.getElementById('addArtist').value = '';
+            document.getElementById('addFileId').value = '';
+            document.getElementById('addCover').value = '';
+        }
+
+        // ==================== Edit Song ====================
+        function openEditModal(index) {
+            const song = songs[index];
+            document.getElementById('editId').value = index;
+            document.getElementById('editTitle').value = song.title || '';
+            document.getElementById('editArtist').value = song.artist || '';
+            document.getElementById('editFileId').value = song.file_id || '';
+            document.getElementById('editCover').value = song.cover || '';
+            editModal.style.display = 'flex';
+        }
+
+        document.getElementById('cancelEditBtn').addEventListener('click', () => {
+            editModal.style.display = 'none';
+        });
+
+        document.getElementById('saveEditBtn').addEventListener('click', () => {
+            const index = parseInt(document.getElementById('editId').value);
+            if (isNaN(index) || index < 0 || index >= songs.length) return;
+
+            songs[index].title = document.getElementById('editTitle').value.trim();
+            songs[index].artist = document.getElementById('editArtist').value.trim();
+            songs[index].file_id = document.getElementById('editFileId').value.trim();
+            songs[index].cover = document.getElementById('editCover').value.trim();
+
+            renderSongList();
+            editModal.style.display = 'none';
+            showToast('បានធ្វើបច្ចុប្បន្នភាព!', 'success');
+        });
+
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) editModal.style.display = 'none';
+        });
+
+        // ==================== Delete Song ====================
+        function deleteSong(index) {
+            if (!confirm(`តើអ្នកពិតជាចង់លុប "${songs[index].title}" មែនទេ?`)) return;
+            songs.splice(index, 1);
+            renderSongList();
+            updateStats();
+            showToast('បានលុបបទចម្រៀង!', 'success');
+        }
+
+        // ==================== Save to GitHub ====================
+        document.getElementById('saveToGitHub').addEventListener('click', async () => {
+            if (!githubToken) {
+                showToast('សូមចូលប្រើម្តងទៀតជាមួយ GitHub Token', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('saveToGitHub');
+            btn.textContent = '⏳ កំពុងរក្សាទុក...';
+            btn.disabled = true;
+
+            try {
+                const content = JSON.stringify(songs, null, 2);
+                const base64Content = btoa(unescape(encodeURIComponent(content)));
+
+                // Get current file SHA
+                const getUrl = `https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}?ref=${GITHUB_CONFIG.branch}`;
+                let sha = '';
+                try {
+                    const getResponse = await fetch(getUrl, {
+                        headers: { 'Authorization': `token ${githubToken}` }
+                    });
+                    if (getResponse.ok) {
+                        const data = await getResponse.json();
+                        sha = data.sha;
+                    }
+                } catch (e) { /* File might not exist yet */ }
+
+                // Update file
+                const putUrl = `https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+                const body = {
+                    message: 'Update songs.json via MelodifyKH Admin',
+                    content: base64Content,
+                    branch: GITHUB_CONFIG.branch
+                };
+                if (sha) body.sha = sha;
+
+                const putResponse = await fetch(putUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (putResponse.ok) {
+                    showToast('បានរក្សាទុកទៅ GitHub ដោយជោគជ័យ! ✅', 'success');
+                } else {
+                    const errData = await putResponse.json();
+                    showToast('កំហុស: ' + (errData.message || 'មិនអាចរក្សាទុកបាន'), 'error');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                showToast('មិនអាចភ្ជាប់ទៅ GitHub បានទេ', 'error');
+            } finally {
+                btn.textContent = '💾 រក្សាទុកទៅ GitHub';
+                btn.disabled = false;
+            }
+        });
+
+        // ==================== Toast ====================
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

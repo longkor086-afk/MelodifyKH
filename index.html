@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MelodifyKH - តន្ត្រីខ្មែរ</title>
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #1e1e1e;
+            --bg-card-hover: #252525;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent: #7c3aed;
+            --accent-hover: #6d28d9;
+            --accent-light: #8b5cf6;
+            --player-bg: #0a0a0a;
+            --border: #2a2a2a;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --blur: blur(10px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 100px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 15, 15, 0.85);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4); }
+            50% { box-shadow: 0 4px 25px rgba(124, 58, 237, 0.7); }
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-light), #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: var(--text-secondary);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        /* Grid View */
+        .song-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .song-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .song-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 24px;
+            }
+        }
+
+        /* Song Card */
+        .song-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid transparent;
+        }
+
+        .song-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            border-color: var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .song-card:active {
+            transform: scale(0.97);
+        }
+
+        .card-cover-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            background: var(--bg-secondary);
+        }
+
+        .card-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card-cover.loaded {
+            opacity: 1;
+        }
+
+        .card-cover-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--text-secondary);
+        }
+
+        .song-card:hover .card-cover {
+            transform: scale(1.05);
+        }
+
+        .play-overlay {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.5);
+            z-index: 2;
+        }
+
+        .song-card:hover .play-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-info {
+            padding: 4px 0;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .card-artist {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Playing indicator */
+        .song-card.playing {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+        }
+
+        .song-card.playing .card-cover-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(124, 58, 237, 0.2);
+            z-index: 1;
+            border-radius: 12px;
+        }
+
+        .playing-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 2px;
+            align-items: flex-end;
+            height: 16px;
+            z-index: 2;
+        }
+
+        .playing-indicator .bar {
+            width: 3px;
+            background: var(--accent-light);
+            border-radius: 2px;
+            animation: soundBars 0.8s ease-in-out infinite;
+        }
+
+        .playing-indicator .bar:nth-child(1) { height: 10px; animation-delay: 0s; }
+        .playing-indicator .bar:nth-child(2) { height: 16px; animation-delay: 0.2s; }
+        .playing-indicator .bar:nth-child(3) { height: 8px; animation-delay: 0.4s; }
+        .playing-indicator .bar:nth-child(4) { height: 14px; animation-delay: 0.6s; }
+
+        @keyframes soundBars {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.5); }
+        }
+
+        /* Loading */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Mini Player */
+        .mini-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--player-bg);
+            border-top: 1px solid var(--border);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            padding: 12px 16px;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .mini-player.hidden {
+            transform: translateY(100%);
+        }
+
+        .mini-player-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .mini-cover {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: var(--bg-secondary);
+        }
+
+        .mini-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .mini-title {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-primary);
+        }
+
+        .mini-artist {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mini-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mini-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .mini-btn:hover {
+            background: var(--bg-card);
+            color: var(--accent-light);
+        }
+
+        .mini-btn.play-btn {
+            background: var(--accent);
+            color: white;
+            width: 44px;
+            height: 44px;
+            font-size: 22px;
+        }
+
+        .mini-btn.play-btn:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        .mini-btn.active {
+            color: var(--accent-light);
+        }
+
+        .progress-container {
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--border);
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-light);
+            border-radius: 0 2px 2px 0;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: -4px;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-light);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .progress-container:hover .progress-bar::after {
+            opacity: 1;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 2000;
+            font-size: 14px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.5s forwards;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo-icon">🎵</div>
+            <span class="logo-text">MelodifyKH</span>
+        </div>
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="searchInput" placeholder="ស្វែងរកបទចម្រៀង...">
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h2 class="section-title" id="sectionTitle">បទចម្រៀងថ្មីៗ</h2>
+        <div class="song-grid" id="songGrid"></div>
+        <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+        <div class="no-results" id="noResults" style="display: none;">
+            រកមិនឃើញបទចម្រៀងទេ
+        </div>
+    </main>
+
+    <!-- Mini Player -->
+    <div class="mini-player hidden" id="miniPlayer">
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+        </div>
+        <div class="mini-player-content">
+            <img class="mini-cover" id="miniCover" src="" alt="Cover" onerror="this.style.display='none'">
+            <div class="mini-info">
+                <div class="mini-title" id="miniTitle">ជ្រើសរើសបទ</div>
+                <div class="mini-artist" id="miniArtist">-</div>
+            </div>
+            <div class="mini-controls">
+                <button class="mini-btn" id="shuffleBtn" title="Shuffle">🔀</button>
+                <button class="mini-btn" id="prevBtn" title="Previous">⏮️</button>
+                <button class="mini-btn play-btn" id="playPauseBtn" title="Play/Pause">▶️</button>
+                <button class="mini-btn" id="nextBtn" title="Next">⏭️</button>
+                <button class="mini-btn" id="repeatBtn" title="Repeat">🔁</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Element -->
+    <audio id="audioPlayer" preload="metadata"></audio>
+
+    <script>
+        // ==================== MelodifyKH App ====================
+        const API_BASE = 'https://melodify-api-2mag.onrender.com';
+        const SONGS_JSON_URL = 'songs.json';
+        const SONGS_PER_PAGE = 20;
+
+        // State
+        let allSongs = [];
+        let filteredSongs = [];
+        let displayedSongs = [];
+        let currentPage = 0;
+        let isLoading = false;
+        let hasMore = true;
+        let currentSongIndex = -1;
+        let isPlaying = false;
+        let isShuffled = false;
+        let repeatMode = 0; // 0: off, 1: repeat all, 2: repeat one
+        let shuffleQueue = [];
+        let searchQuery = '';
+
+        // DOM Elements
+        const songGrid = document.getElementById('songGrid');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const noResults = document.getElementById('noResults');
+        const searchInput = document.getElementById('searchInput');
+        const sectionTitle = document.getElementById('sectionTitle');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const miniPlayer = document.getElementById('miniPlayer');
+        const miniCover = document.getElementById('miniCover');
+        const miniTitle = document.getElementById('miniTitle');
+        const miniArtist = document.getElementById('miniArtist');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const repeatBtn = document.getElementById('repeatBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+
+        // ==================== Fetch Songs ====================
+        async function fetchSongs() {
+            try {
+                const response = await fetch(SONGS_JSON_URL);
+                if (!response.ok) throw new Error('Failed to fetch songs');
+                allSongs = await response.json();
+                filteredSongs = [...allSongs];
+                resetPagination();
+                loadMoreSongs();
+            } catch (error) {
+                console.error('Error fetching songs:', error);
+                showToast('មិនអាចទាញទិន្នន័យបានទេ');
+            }
+        }
+
+        // ==================== Pagination ====================
+        function resetPagination() {
+            currentPage = 0;
+            displayedSongs = [];
+            hasMore = true;
+            songGrid.innerHTML = '';
+        }
+
+        function loadMoreSongs() {
+            if (isLoading || !hasMore) return;
+            isLoading = true;
+            loadingSpinner.style.display = 'flex';
+
+            setTimeout(() => {
+                const start = currentPage * SONGS_PER_PAGE;
+                const end = start + SONGS_PER_PAGE;
+                const newSongs = filteredSongs.slice(start, end);
+
+                if (newSongs.length === 0) {
+                    hasMore = false;
+                    loadingSpinner.style.display = 'none';
+                    isLoading = false;
+                    if (displayedSongs.length === 0) {
+                        noResults.style.display = 'block';
+                    }
+                    return;
+                }
+
+                displayedSongs = [...displayedSongs, ...newSongs];
+                renderSongs(newSongs);
+                currentPage++;
+                isLoading = false;
+                loadingSpinner.style.display = 'none';
+                noResults.style.display = 'none';
+
+                if (newSongs.length < SONGS_PER_PAGE) {
+                    hasMore = false;
+                }
+            }, 300);
+        }
+
+        // ==================== Render Songs ====================
+        function renderSongs(songsToRender) {
+            songsToRender.forEach(song => {
+                const card = createSongCard(song);
+                songGrid.appendChild(card);
+            });
+            setupLazyLoading();
+        }
+
+        function createSongCard(song) {
+            const card = document.createElement('div');
+            card.className = 'song-card';
+            card.setAttribute('data-song-id', song.id);
+            card.innerHTML = `
+                <div class="card-cover-container">
+                    <div class="card-cover-placeholder">🎵</div>
+                    <img class="card-cover lazy" 
+                         data-src="${song.cover || ''}" 
+                         src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
+                         alt="${song.title}"
+                         onerror="this.style.display='none'; this.parentElement.querySelector('.card-cover-placeholder').style.display='flex';">
+                    <div class="play-overlay">▶️</div>
+                    <div class="playing-indicator" style="display: none;">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">${song.title || 'គ្មានចំណងជើង'}</div>
+                    <div class="card-artist">${song.artist || 'មិនស្គាល់'}</div>
+                </div>
+            `;
+
+            card.addEventListener('click', () => playSong(song));
+            return card;
+        }
+
+        // ==================== Lazy Loading ====================
+        function setupLazyLoading() {
+            const lazyImages = document.querySelectorAll('.lazy');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        const src = img.getAttribute('data-src');
+                        if (src) {
+                            img.src = src;
+                            img.onload = () => {
+                                img.classList.add('loaded');
+                                const placeholder = img.parentElement.querySelector('.card-cover-placeholder');
+                                if (placeholder) placeholder.style.display = 'none';
+                            };
+                            img.onerror = () => {
+                                const placeholder = img.parentElement.querySelector('.card-cover-placeholder');
+                                if (placeholder) placeholder.style.display = 'flex';
+                            };
+                        }
+                        img.classList.remove('lazy');
+                        observer.unobserve(img);
+                    }
+                });
+            }, { rootMargin: '100px' });
+
+            lazyImages.forEach(img => observer.observe(img));
+        }
+
+        // ==================== Infinite Scroll ====================
+        function setupInfiniteScroll() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && hasMore && !isLoading) {
+                        loadMoreSongs();
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            if (loadingSpinner) {
+                observer.observe(loadingSpinner);
+            }
+        }
+
+        // ==================== Play Song ====================
+        function playSong(song) {
+            const index = displayedSongs.findIndex(s => s.id === song.id);
+            if (index !== -1) {
+                currentSongIndex = index;
+            } else {
+                currentSongIndex = displayedSongs.length;
+                displayedSongs.push(song);
+            }
+
+            loadAndPlaySong(song);
+        }
+
+        function loadAndPlaySong(song) {
+            audioPlayer.src = `${API_BASE}/song/${song.file_id}`;
+            audioPlayer.load();
+            audioPlayer.play().then(() => {
+                isPlaying = true;
+                updatePlayPauseBtn();
+                updateMiniPlayer(song);
+                updateActiveCard();
+                miniPlayer.classList.remove('hidden');
+            }).catch(err => {
+                console.error('Playback error:', err);
+                showToast('មិនអាចចាក់បទនេះបានទេ');
+            });
+        }
+
+        function updateMiniPlayer(song) {
+            miniTitle.textContent = song.title || 'គ្មានចំណងជើង';
+            miniArtist.textContent = song.artist || 'មិនស្គាល់';
+            if (song.cover) {
+                miniCover.src = song.cover;
+                miniCover.style.display = 'block';
+            } else {
+                miniCover.style.display = 'none';
+            }
+        }
+
+        function updatePlayPauseBtn() {
+            playPauseBtn.textContent = isPlaying ? '⏸️' : '▶️';
+        }
+
+        function updateActiveCard() {
+            document.querySelectorAll('.song-card').forEach(card => card.classList.remove('playing'));
+            document.querySelectorAll('.playing-indicator').forEach(ind => ind.style.display = 'none');
+
+            if (currentSongIndex >= 0) {
+                const currentSong = displayedSongs[currentSongIndex];
+                const activeCard = document.querySelector(`[data-song-id="${currentSong.id}"]`);
+                if (activeCard) {
+                    activeCard.classList.add('playing');
+                    const indicator = activeCard.querySelector('.playing-indicator');
+                    if (indicator) indicator.style.display = 'flex';
+                }
+            }
+        }
+
+        function togglePlayPause() {
+            if (!audioPlayer.src || audioPlayer.src === window.location.href) {
+                if (displayedSongs.length > 0) {
+                    playSong(displayedSongs[0]);
+                }
+                return;
+            }
+
+            if (isPlaying) {
+                audioPlayer.pause();
+                isPlaying = false;
+            } else {
+                audioPlayer.play().then(() => {
+                    isPlaying = true;
+                }).catch(err => {
+                    console.error('Play error:', err);
+                });
+            }
+            updatePlayPauseBtn();
+        }
+
+        function playNext() {
+            if (displayedSongs.length === 0) return;
+
+            let nextIndex;
+            if (isShuffled) {
+                if (shuffleQueue.length === 0) {
+                    shuffleQueue = [...Array(displayedSongs.length).keys()].filter(i => i !== currentSongIndex);
+                    shuffleArray(shuffleQueue);
+                }
+                nextIndex = shuffleQueue.pop();
+                if (nextIndex === undefined) {
+                    if (repeatMode >= 1) {
+                        shuffleQueue = [...Array(displayedSongs.length).keys()];
+                        shuffleArray(shuffleQueue);
+                        nextIndex = shuffleQueue.pop();
+                    } else {
+                        return;
+                    }
+                }
+            } else {
+                nextIndex = currentSongIndex + 1;
+                if (nextIndex >= displayedSongs.length) {
+                    if (repeatMode === 2) {
+                        nextIndex = currentSongIndex;
+                    } else if (repeatMode === 1) {
+                        nextIndex = 0;
+                    } else {
+                        return;
+                    }
+                }
+            }
+
+            if (nextIndex !== undefined && nextIndex >= 0 && nextIndex < displayedSongs.length) {
+                currentSongIndex = nextIndex;
+                loadAndPlaySong(displayedSongs[currentSongIndex]);
+            }
+        }
+
+        function playPrevious() {
+            if (displayedSongs.length === 0) return;
+
+            let prevIndex;
+            if (isShuffled && shuffleQueue.length > 0) {
+                prevIndex = shuffleQueue[shuffleQueue.length - 1];
+            } else {
+                prevIndex = currentSongIndex - 1;
+                if (prevIndex < 0) {
+                    if (repeatMode >= 1) {
+                        prevIndex = displayedSongs.length - 1;
+                    } else {
+                        prevIndex = 0;
+                    }
+                }
+            }
+
+            if (prevIndex >= 0 && prevIndex < displayedSongs.length) {
+                currentSongIndex = prevIndex;
+                loadAndPlaySong(displayedSongs[currentSongIndex]);
+            }
+        }
+
+        function toggleShuffle() {
+            isShuffled = !isShuffled;
+            shuffleBtn.classList.toggle('active', isShuffled);
+            if (isShuffled) {
+                shuffleQueue = [...Array(displayedSongs.length).keys()].filter(i => i !== currentSongIndex);
+                shuffleArray(shuffleQueue);
+                showToast('🔀 Shuffle ON');
+            } else {
+                shuffleQueue = [];
+                showToast('🔀 Shuffle OFF');
+            }
+        }
+
+        function toggleRepeat() {
+            repeatMode = (repeatMode + 1) % 3;
+            repeatBtn.classList.remove('active');
+            switch (repeatMode) {
+                case 0:
+                    repeatBtn.textContent = '🔁';
+                    showToast('🔁 Repeat OFF');
+                    break;
+                case 1:
+                    repeatBtn.textContent = '🔁';
+                    repeatBtn.classList.add('active');
+                    showToast('🔁 Repeat All');
+                    break;
+                case 2:
+                    repeatBtn.textContent = '🔂';
+                    repeatBtn.classList.add('active');
+                    showToast('🔂 Repeat One');
+                    break;
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // ==================== Search ====================
+        searchInput.addEventListener('input', function(e) {
+            searchQuery = e.target.value.toLowerCase().trim();
+
+            if (searchQuery === '') {
+                filteredSongs = [...allSongs];
+                sectionTitle.textContent = 'បទចម្រៀងថ្មីៗ';
+            } else {
+                filteredSongs = allSongs.filter(song =>
+                    (song.title && song.title.toLowerCase().includes(searchQuery)) ||
+                    (song.artist && song.artist.toLowerCase().includes(searchQuery))
+                );
+                sectionTitle.textContent = `លទ្ធផលស្វែងរក: "${searchQuery}"`;
+            }
+
+            resetPagination();
+            loadMoreSongs();
+        });
+
+        // ==================== Progress Bar ====================
+        audioPlayer.addEventListener('timeupdate', () => {
+            if (audioPlayer.duration) {
+                const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                progressBar.style.width = progress + '%';
+            }
+        });
+
+        progressContainer.addEventListener('click', (e) => {
+            if (!audioPlayer.duration) return;
+            const rect = progressContainer.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            audioPlayer.currentTime = percent * audioPlayer.duration;
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            if (repeatMode === 2) {
+                audioPlayer.currentTime = 0;
+                audioPlayer.play();
+            } else {
+                playNext();
+            }
+        });
+
+        audioPlayer.addEventListener('play', () => {
+            isPlaying = true;
+            updatePlayPauseBtn();
+            updateActiveCard();
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            isPlaying = false;
+            updatePlayPauseBtn();
+        });
+
+        // ==================== Button Events ====================
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        nextBtn.addEventListener('click', playNext);
+        prevBtn.addEventListener('click', playPrevious);
+        shuffleBtn.addEventListener('click', toggleShuffle);
+        repeatBtn.addEventListener('click', toggleRepeat);
+
+        // ==================== Toast ====================
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ==================== Keyboard Controls ====================
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            switch (e.code) {
+                case 'Space':
+                    e.preventDefault();
+                    togglePlayPause();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    playNext();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    playPrevious();
+                    break;
+            }
+        });
+
+        // ==================== Init ====================
+        function init() {
+            fetchSongs();
+            setupInfiniteScroll();
+        }
+
+        init();
+        console.log('🎵 MelodifyKH Ready!');
+    </script>
+</body>
+</html>
