@@ -165,7 +165,7 @@ function playSong(song) {
         );
 
     audio.src =
-        API_URL + song.file_id;
+"https://melodify-api-2mag.onrender.com/song/" + song.file_id;
 
     audio.play();
 
