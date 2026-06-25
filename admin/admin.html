@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MelodifyKH Admin</title>
+
+<link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+<header>
+<h1>🎵 MelodifyKH Admin</h1>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h2>បន្ថែមបទចម្រៀង</h2>
+
+<input id="title" placeholder="ចំណងជើង">
+
+<input id="artist" placeholder="Artist">
+
+<input id="fileId" placeholder="Telegram File ID">
+
+<input id="cover" placeholder="Cover URL">
+
+<button onclick="addSong()">
+➕ បន្ថែមបទ
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>បទចម្រៀងទាំងអស់</h2>
+
+<input
+id="search"
+placeholder="ស្វែងរក..."
+oninput="renderSongs()">
+
+<div id="songList"></div>
+
+<div id="pagination"></div>
+
+</div>
+
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>
