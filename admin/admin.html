@@ -1,53 +1,170 @@
+<!-- admin/admin.html -->
+
 <!DOCTYPE html>
-<html lang="km">
+<html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MelodifyKH Admin</title>
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Melodify Admin</title>
 
 <link rel="stylesheet" href="admin.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
 
+<!-- Login -->
+
+<div id="loginPage">
+
+<div class="loginCard">
+
+<img src="../assets/logo.png" class="logo">
+
+<h2>MelodifyKH Admin</h2>
+
+<p>Administrator Login</p>
+
+<input
+type="password"
+id="adminPassword"
+placeholder="Password">
+
+<input
+type="password"
+id="githubToken"
+placeholder="GitHub Token">
+
+<button id="loginBtn">
+
+Login
+
+</button>
+
+<p id="loginStatus"></p>
+
+</div>
+
+</div>
+
+<!-- Dashboard -->
+
+<div id="dashboard" style="display:none;">
+
 <header>
-<h1>🎵 MelodifyKH Admin</h1>
-</header>
 
-<div class="container">
+<h1>
 
-<div class="card">
+🎵 Melodify Dashboard
 
-<h2>បន្ថែមបទចម្រៀង</h2>
+</h1>
 
-<input id="title" placeholder="ចំណងជើង">
+<div>
 
-<input id="artist" placeholder="Artist">
+<button id="logoutBtn">
 
-<input id="fileId" placeholder="Telegram File ID">
+Logout
 
-<input id="cover" placeholder="Cover URL">
-
-<button onclick="addSong()">
-➕ បន្ថែមបទ
 </button>
 
 </div>
 
+</header>
+
+<section class="stats">
+
 <div class="card">
 
-<h2>បទចម្រៀងទាំងអស់</h2>
+<h2 id="totalSongs">
 
-<input
-id="search"
-placeholder="ស្វែងរក..."
-oninput="renderSongs()">
+0
 
-<div id="songList"></div>
+</h2>
 
-<div id="pagination"></div>
+<p>Total Songs</p>
 
 </div>
+
+<div class="card">
+
+<h2 id="todaySongs">
+
+0
+
+</h2>
+
+<p>Added Today</p>
+
+</div>
+
+<div class="card">
+
+<h2 id="totalArtists">
+
+0
+
+</h2>
+
+<p>Artists</p>
+
+</div>
+
+</section>
+
+<section class="form">
+
+<h2>Add Song</h2>
+
+<input
+id="title"
+placeholder="Song Title">
+
+<input
+id="artist"
+placeholder="Artist">
+
+<input
+id="album"
+placeholder="Album">
+
+<input
+id="cover"
+placeholder="Cover URL">
+
+<input
+id="fileid"
+placeholder="Telegram File ID">
+
+<button id="addSongBtn">
+
+➕ Add Song
+
+</button>
+
+</section>
+
+<section>
+
+<h2>
+
+Songs
+
+</h2>
+
+<input
+id="searchSong"
+placeholder="Search...">
+
+<div id="songList">
+
+</div>
+
+</section>
 
 </div>
 
