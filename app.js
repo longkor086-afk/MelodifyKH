@@ -722,3 +722,163 @@ document.getElementById("shareSong")
 shareSong
 
 );
+// =========================
+// Queue
+// =========================
+
+let queue=[];
+
+function addToQueue(song){
+
+queue.push(song);
+
+renderQueue();
+
+showToast("🎵 Added to Queue");
+
+}
+
+function renderQueue(){
+
+const box=document.getElementById("queueSongs");
+
+if(!box) return;
+
+box.innerHTML="";
+
+queue.forEach(song=>{
+
+const item=document.createElement("div");
+
+item.className="queueSong";
+
+item.innerHTML=`
+
+<img src="${song.cover||'assets/default.png'}">
+
+<div class="queueSongInfo">
+
+<h3>${escapeHtml(song.title)}</h3>
+
+<p>${escapeHtml(song.artist)}</p>
+
+</div>
+
+`;
+
+item.onclick=()=>playSong(song);
+
+box.appendChild(item);
+
+});
+
+}
+
+document.getElementById("addQueue")
+?.addEventListener("click",()=>{
+
+if(currentSong) addToQueue(currentSong);
+
+});
+
+// =========================
+// Toast
+// =========================
+
+function showToast(text){
+
+const toast=document.getElementById("toast");
+
+if(!toast) return;
+
+toast.textContent=text;
+
+toast.style.display="block";
+
+clearTimeout(window.toastTimer);
+
+window.toastTimer=setTimeout(()=>{
+
+toast.style.display="none";
+
+},2500);
+
+}
+
+// =========================
+// Loading
+// =========================
+
+function showLoading(show){
+
+const loading=document.getElementById("loading");
+
+if(!loading) return;
+
+loading.style.display=show?"flex":"none";
+
+}
+
+// =========================
+// Escape HTML
+// =========================
+
+function escapeHtml(text){
+
+return String(text||"")
+
+.replace(/&/g,"&amp;")
+
+.replace(/</g,"&lt;")
+
+.replace(/>/g,"&gt;")
+
+.replace(/"/g,"&quot;")
+
+.replace(/'/g,"&#039;");
+
+}
+
+// =========================
+// Open / Close Player
+// =========================
+
+document.getElementById("miniPlayer").onclick=()=>{
+
+document.getElementById("playerPage").style.display="flex";
+
+};
+
+document.getElementById("closePlayer").onclick=()=>{
+
+document.getElementById("playerPage").style.display="none";
+
+};
+
+// =========================
+// Start App
+// =========================
+
+window.onload=()=>{
+
+loadSongs();
+
+setTimeout(()=>{
+
+const splash=document.getElementById("splash");
+
+if(splash){
+
+splash.style.opacity="0";
+
+setTimeout(()=>{
+
+splash.style.display="none";
+
+},500);
+
+}
+
+},1500);
+
+};
