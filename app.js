@@ -1,410 +1,724 @@
-const API_URL = "https://melodify-api-2mag.onrender.com/song/";
+// =========================
+// MelodifyKH V3
+// app.js Part 1
+// =========================
 
-const ITEMS_PER_PAGE = 20;
+const audio = document.getElementById("audio");
 
 let allSongs = [];
 let filteredSongs = [];
 
+let currentSong = null;
+let currentIndex = -1;
+
+let isPlaying = false;
+let isShuffle = false;
+let isRepeat = false;
+
+const SONGS_PER_PAGE = 20;
 let currentPage = 1;
-let currentSongIndex = -1;
 
-let shuffle = false;
-let repeat = false;
+// =========================
+// DOM
+// =========================
 
-const audio = document.getElementById("audio");
+const discoverSongs =
+document.getElementById("discoverSongs");
 
-// Load songs
-async function loadSongs() {
-    try {
-        const res = await fetch("songs.json");
-        allSongs = await res.json();
+const trendingSongs =
+document.getElementById("trendingSongs");
 
-        filteredSongs = [...allSongs];
+const recommendedSongs =
+document.getElementById("recommendedSongs");
 
-        renderSongs();
-        renderPagination();
+const newSongs =
+document.getElementById("newSongs");
 
-    } catch (err) {
-        console.error(err);
-    }
+const searchInput =
+document.getElementById("searchInput");
+
+// =========================
+// Load Songs
+// =========================
+
+async function loadSongs(){
+
+showLoading(true);
+
+try{
+
+const res = await fetch("songs.json");
+
+allSongs = await res.json();
+
+filteredSongs = [...allSongs];
+
+renderHome();
+
 }
+catch(e){
 
-// Render songs
-function renderSongs() {
+console.log(e);
 
-    const grid = document.getElementById("songGrid");
-
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-
-    const songs = filteredSongs.slice(start, end);
-
-    grid.innerHTML = "";
-
-    songs.forEach(song => {
-
-        const card = document.createElement("div");
-        card.className = "song-card";
-
-        let cover = "";
-
-        if (song.cover) {
-            cover = `
-            <img
-                class="song-cover"
-                src="${song.cover}"
-                loading="lazy"
-            >
-            `;
-        } else {
-            cover = `
-            <div class="default-cover">
-                🎵
-            </div>
-            `;
-        }
-
-        card.innerHTML = `
-            ${cover}
-
-            <div class="song-info">
-                <div class="song-title">
-                    ${song.title || "Unknown"}
-                </div>
-
-                <div class="song-artist">
-                    ${song.artist || "Unknown"}
-                </div>
-            </div>
-        `;
-
-        card.onclick = () => playSong(song);
-
-        grid.appendChild(card);
-
-    });
+showToast("❌ Cannot load songs");
 
 }
 
-// Pagination
-function renderPagination() {
-
-    const totalPages =
-        Math.ceil(filteredSongs.length / ITEMS_PER_PAGE);
-
-    const pagination =
-        document.getElementById("pagination");
-
-    pagination.innerHTML = "";
-
-    for (let i = 1; i <= totalPages; i++) {
-
-        const btn =
-            document.createElement("button");
-
-        btn.textContent = i;
-
-        if (i === currentPage) {
-            btn.classList.add("active");
-        }
-
-        btn.onclick = () => {
-
-            currentPage = i;
-
-            renderSongs();
-            renderPagination();
-
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-
-        };
-
-        pagination.appendChild(btn);
-
-    }
+showLoading(false);
 
 }
 
-// Search
-document
-.getElementById("searchInput")
-.addEventListener("input", function () {
+// =========================
+// Render Home
+// =========================
 
-    const q =
-        this.value.toLowerCase();
+function renderHome(){
 
-    filteredSongs =
-        allSongs.filter(song =>
-            (song.title || "")
-            .toLowerCase()
-            .includes(q)
-            ||
-            (song.artist || "")
-            .toLowerCase()
-            .includes(q)
-        );
+renderTrending();
 
-    currentPage = 1;
+renderNewSongs();
 
-    renderSongs();
-    renderPagination();
+renderRecommended();
+
+renderDiscover();
+
+}
+
+// =========================
+// Trending
+// =========================
+
+function renderTrending(){
+
+trendingSongs.innerHTML="";
+
+const list=[...allSongs]
+.slice(0,10);
+
+list.forEach(song=>{
+
+trendingSongs.appendChild(
+
+createSongCard(song)
+
+);
 
 });
 
+}
+
+// =========================
+// New Songs
+// =========================
+
+function renderNewSongs(){
+
+newSongs.innerHTML="";
+
+const list=[...allSongs]
+
+.sort((a,b)=>
+
+new Date(b.addedAt)-new Date(a.addedAt)
+
+)
+
+.slice(0,10);
+
+list.forEach(song=>{
+
+newSongs.appendChild(
+
+createSongCard(song)
+
+);
+
+});
+
+}
+
+// =========================
+// Recommended
+// =========================
+
+function renderRecommended(){
+
+recommendedSongs.innerHTML="";
+
+const random=[...allSongs]
+
+.sort(()=>Math.random()-0.5)
+
+.slice(0,10);
+
+random.forEach(song=>{
+
+recommendedSongs.appendChild(
+
+createSongCard(song)
+
+);
+
+});
+
+}
+
+// =========================
+// Discover
+// =========================
+
+function renderDiscover(){
+
+discoverSongs.innerHTML="";
+
+filteredSongs.forEach(song=>{
+
+discoverSongs.appendChild(
+
+createGridCard(song)
+
+);
+
+});
+
+}
+// =========================
+// Create Horizontal Card
+// =========================
+
+function createSongCard(song){
+
+const card=document.createElement("div");
+
+card.className="songCard";
+
+card.innerHTML=`
+
+<img src="${song.cover || 'assets/default.png'}">
+
+<h3>${escapeHtml(song.title)}</h3>
+
+<p>${escapeHtml(song.artist)}</p>
+
+`;
+
+card.onclick=()=>{
+
+playSong(song);
+
+};
+
+return card;
+
+}
+
+// =========================
+// Create Grid Card
+// =========================
+
+function createGridCard(song){
+
+const card=document.createElement("div");
+
+card.className="songItem";
+
+card.innerHTML=`
+
+<img src="${song.cover || 'assets/default.png'}">
+
+<div class="songInfo">
+
+<h3>${escapeHtml(song.title)}</h3>
+
+<p>${escapeHtml(song.artist)}</p>
+
+</div>
+
+`;
+
+card.onclick=()=>{
+
+playSong(song);
+
+};
+
+return card;
+
+}
+
+// =========================
 // Play Song
-function playSong(song) {
+// =========================
 
-    if (!song.file_id) return;
+function playSong(song){
 
-    currentSongIndex =
-        allSongs.findIndex(
-            s => s.id === song.id
-        );
+if(!song.file_id){
 
-    audio.src =
-"https://melodify-api-2mag.onrender.com/song/" + song.file_id;
+showToast("❌ File ID not found");
 
-    audio.play();
-
-    updatePlayer(song);
+return;
 
 }
 
+currentSong=song;
+
+currentIndex=allSongs.findIndex(
+
+s=>s.id===song.id
+
+);
+
+audio.src=
+
+"https://melodify-api-2mag.onrender.com/song/"+
+
+song.file_id;
+
+audio.play();
+
+updatePlayer();
+
+saveHistory(song);
+
+}
+
+// =========================
 // Update Player
-function updatePlayer(song) {
+// =========================
 
-    document
-        .getElementById("miniPlayer")
-        .classList
-        .remove("hidden");
+function updatePlayer(){
 
-    document
-        .getElementById("playerTitle")
-        .textContent =
-        song.title || "Unknown";
+document.getElementById("miniTitle").textContent=
 
-    document
-        .getElementById("playerArtist")
-        .textContent =
-        song.artist || "Unknown";
+currentSong.title;
 
-    document
-        .getElementById("modalTitle")
-        .textContent =
-        song.title || "Unknown";
+document.getElementById("miniArtist").textContent=
 
-    document
-        .getElementById("modalArtist")
-        .textContent =
-        song.artist || "Unknown";
+currentSong.artist;
 
-    const modalCover =
-        document.getElementById("modalCover");
+document.getElementById("playerTitle").textContent=
 
-    const miniCover =
-        document.getElementById("playerCover");
+currentSong.title;
 
-    if (song.cover) {
+document.getElementById("playerArtist").textContent=
 
-        modalCover.innerHTML =
-            `<img src="${song.cover}" class="song-cover">`;
+currentSong.artist;
 
-        miniCover.innerHTML =
-            `<img src="${song.cover}" class="song-cover">`;
+document.getElementById("miniCover").src=
 
-    } else {
+currentSong.cover;
 
-        modalCover.innerHTML = "";
-        miniCover.innerHTML = "";
+document.getElementById("playerCover").src=
 
-    }
+currentSong.cover;
+
+document.getElementById("miniPlayer").style.display=
+
+"flex";
 
 }
 
-// Play/Pause
-function togglePlay() {
+// =========================
+// Toggle Play
+// =========================
 
-    if (!audio.src && allSongs.length) {
+document.getElementById("playBtn").onclick=()=>{
 
-        playSong(allSongs[0]);
-        return;
+if(audio.paused){
 
-    }
+audio.play();
 
-    if (audio.paused) {
+}else{
 
-        audio.play();
-
-    } else {
-
-        audio.pause();
-
-    }
+audio.pause();
 
 }
 
-// Previous
-function prevSong() {
+};
 
-    if (!allSongs.length) return;
+document.getElementById("miniPlay").onclick=()=>{
 
-    currentSongIndex--;
+if(audio.paused){
 
-    if (currentSongIndex < 0) {
-        currentSongIndex =
-            allSongs.length - 1;
-    }
+audio.play();
 
-    playSong(
-        allSongs[currentSongIndex]
-    );
+}else{
+
+audio.pause();
 
 }
 
-// Next
-function nextSong() {
+};
 
-    if (!allSongs.length) return;
+audio.onplay=()=>{
 
-    if (shuffle) {
+isPlaying=true;
 
-        currentSongIndex =
-            Math.floor(
-                Math.random()
-                * allSongs.length
-            );
+document.getElementById("playBtn").innerHTML="⏸";
 
-    } else {
+document.getElementById("miniPlay").innerHTML="⏸";
 
-        currentSongIndex++;
+};
 
-        if (
-            currentSongIndex >=
-            allSongs.length
-        ) {
-            currentSongIndex = 0;
-        }
+audio.onpause=()=>{
 
-    }
+isPlaying=false;
 
-    playSong(
-        allSongs[currentSongIndex]
-    );
+document.getElementById("playBtn").innerHTML="▶";
 
-}
+document.getElementById("miniPlay").innerHTML="▶";
 
-// Audio End
-audio.addEventListener(
-    "ended",
-    () => {
+};
+// =========================
+// Next Song
+// =========================
 
-        if (repeat) {
+document.getElementById("nextBtn").onclick = nextSong;
 
-            audio.currentTime = 0;
-            audio.play();
+function nextSong(){
 
-        } else {
+if(allSongs.length===0) return;
 
-            nextSong();
+if(isShuffle){
 
-        }
+currentIndex=Math.floor(Math.random()*allSongs.length);
 
-    }
-);
+}else{
 
-// Shuffle
-function toggleShuffle() {
+currentIndex++;
 
-    shuffle = !shuffle;
+if(currentIndex>=allSongs.length){
 
-    alert(
-        shuffle
-        ? "🔀 Shuffle ON"
-        : "🔀 Shuffle OFF"
-    );
+currentIndex=0;
 
 }
 
+}
+
+playSong(allSongs[currentIndex]);
+
+}
+
+// =========================
+// Previous Song
+// =========================
+
+document.getElementById("prevBtn").onclick = prevSong;
+
+function prevSong(){
+
+if(allSongs.length===0) return;
+
+if(isShuffle){
+
+currentIndex=Math.floor(Math.random()*allSongs.length);
+
+}else{
+
+currentIndex--;
+
+if(currentIndex<0){
+
+currentIndex=allSongs.length-1;
+
+}
+
+}
+
+playSong(allSongs[currentIndex]);
+
+}
+
+// =========================
 // Repeat
-function toggleRepeat() {
+// =========================
 
-    repeat = !repeat;
+document.getElementById("repeatBtn").onclick=()=>{
 
-    alert(
-        repeat
-        ? "🔁 Repeat ON"
-        : "🔁 Repeat OFF"
-    );
+isRepeat=!isRepeat;
+
+document.getElementById("repeatBtn").style.color=
+
+isRepeat ? "#8b5cf6" : "#ffffff";
+
+};
+
+// =========================
+// Shuffle
+// =========================
+
+document.getElementById("shuffleBtn").onclick=()=>{
+
+isShuffle=!isShuffle;
+
+document.getElementById("shuffleBtn").style.color=
+
+isShuffle ? "#8b5cf6" : "#ffffff";
+
+};
+
+// =========================
+// Song End
+// =========================
+
+audio.onended=()=>{
+
+if(isRepeat){
+
+audio.currentTime=0;
+
+audio.play();
+
+return;
 
 }
 
-// Modal
-function openPlayer() {
+nextSong();
 
-    document
-        .getElementById("playerModal")
-        .classList
-        .remove("hidden");
+};
 
-}
-
-function closePlayer() {
-
-    document
-        .getElementById("playerModal")
-        .classList
-        .add("hidden");
-
-}
-
+// =========================
 // Progress
-audio.addEventListener(
-    "timeupdate",
-    () => {
+// =========================
 
-        const progress =
-            document
-            .getElementById(
-                "progressBar"
-            );
+const seekBar=document.getElementById("seekBar");
 
-        if (audio.duration) {
+audio.ontimeupdate=()=>{
 
-            progress.value =
-                (audio.currentTime
-                / audio.duration)
-                * 100;
+if(audio.duration){
 
-        }
+seekBar.max=audio.duration;
 
-    }
+seekBar.value=audio.currentTime;
+
+}
+
+document.getElementById("currentTime").textContent=
+
+formatTime(audio.currentTime);
+
+document.getElementById("duration").textContent=
+
+formatTime(audio.duration);
+
+};
+
+seekBar.oninput=()=>{
+
+audio.currentTime=seekBar.value;
+
+};
+
+// =========================
+// Format Time
+// =========================
+
+function formatTime(sec){
+
+if(isNaN(sec)) return "0:00";
+
+const m=Math.floor(sec/60);
+
+const s=Math.floor(sec%60);
+
+return m+":"+(s<10?"0":"")+s;
+
+}
+// =========================
+// Search
+// =========================
+
+searchInput.addEventListener("input", searchSongs);
+
+function searchSongs(){
+
+const keyword=searchInput.value
+.toLowerCase()
+.trim();
+
+if(keyword===""){
+
+filteredSongs=[...allSongs];
+
+renderDiscover();
+
+return;
+
+}
+
+filteredSongs=allSongs.filter(song=>{
+
+const title=(song.title||"").toLowerCase();
+
+const artist=(song.artist||"").toLowerCase();
+
+const album=(song.album||"").toLowerCase();
+
+return(
+
+title.includes(keyword) ||
+
+artist.includes(keyword) ||
+
+album.includes(keyword)
+
 );
 
-document
-.getElementById("progressBar")
-.addEventListener(
-    "input",
-    function () {
+});
 
-        if (!audio.duration) return;
+renderDiscover();
 
-        audio.currentTime =
-            (this.value / 100)
-            * audio.duration;
+}
 
-    }
+// =========================
+// Like Song
+// =========================
+
+let likedSongs=
+
+JSON.parse(
+
+localStorage.getItem("likedSongs")
+
+)||[];
+
+function likeCurrentSong(){
+
+if(!currentSong) return;
+
+const exists=
+
+likedSongs.find(
+
+s=>s.id===currentSong.id
+
 );
 
-// Open full player
-document
-.getElementById("miniPlayer")
-.addEventListener(
-    "click",
-    openPlayer
+if(exists){
+
+showToast("❤️ Already liked");
+
+return;
+
+}
+
+likedSongs.push(currentSong);
+
+localStorage.setItem(
+
+"likedSongs",
+
+JSON.stringify(likedSongs)
+
 );
 
-// Start
-loadSongs();
+showToast("❤️ Added to Liked Songs");
+
+}
+
+document.getElementById("likeSong")
+?.addEventListener("click",likeCurrentSong);
+
+// =========================
+// History
+// =========================
+
+function saveHistory(song){
+
+let history=
+
+JSON.parse(
+
+localStorage.getItem("history")
+
+)||[];
+
+history=history.filter(
+
+s=>s.id!==song.id
+
+);
+
+history.unshift(song);
+
+if(history.length>100){
+
+history.length=100;
+
+}
+
+localStorage.setItem(
+
+"history",
+
+JSON.stringify(history)
+
+);
+
+}
+
+// =========================
+// Download
+// =========================
+
+function downloadCurrentSong(){
+
+if(!currentSong) return;
+
+window.open(
+
+audio.src,
+
+"_blank"
+
+);
+
+}
+
+document.getElementById("downloadSong")
+?.addEventListener(
+
+"click",
+
+downloadCurrentSong
+
+);
+
+// =========================
+// Share
+// =========================
+
+function shareSong(){
+
+if(!currentSong) return;
+
+if(navigator.share){
+
+navigator.share({
+
+title:currentSong.title,
+
+text:currentSong.artist,
+
+url:location.href
+
+});
+
+}else{
+
+navigator.clipboard.writeText(location.href);
+
+showToast("📋 Link Copied");
+
+}
+
+}
+
+document.getElementById("shareSong")
+?.addEventListener(
+
+"click",
+
+shareSong
+
+);
