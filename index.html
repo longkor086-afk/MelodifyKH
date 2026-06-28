@@ -1,40 +1,76 @@
 <!DOCTYPE html>
 <html lang="km">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
 <title>MelodifyKH</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link
+rel="stylesheet"
+href="style.css">
 
-<link rel="stylesheet" href="style.css">
+<link
+rel="preconnect"
+href="https://fonts.googleapis.com">
 
-<link rel="manifest" href="manifest.json">
+<link
+rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
 
-<meta name="theme-color" content="#7c3aed">
+<link
+href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+rel="stylesheet">
+
+<link
+rel="manifest"
+href="manifest.json">
+
+<meta
+name="theme-color"
+content="#8b5cf6">
 
 </head>
+
+<body>
 
 <!-- Splash -->
 
 <div id="splash">
 
-    <div class="logoBox">
+<div class="logoBox">
 
-        <img src="assets/logo.png">
+<img
+src="assets/logo.png"
+alt="MelodifyKH">
 
-        <h1>MelodifyKH</h1>
+<h1>MelodifyKH</h1>
 
-        <p>Khmer Music Player</p>
-
-    </div>
+<p>Music Everywhere</p>
 
 </div>
 
-<!-- Background Blur -->
+</div>
 
-<div id="backgroundBlur"></div>
+<!-- Loading -->
+
+<div id="loading">
+
+<div class="loader"></div>
+
+<p>Loading...</p>
+
+</div>
+
+<!-- Toast -->
+
+<div id="toast"></div>
 
 <!-- Header -->
 
@@ -42,7 +78,8 @@
 
 <div class="logo">
 
-<img src="assets/logo.png">
+<img
+src="assets/logo.png">
 
 <h2>MelodifyKH</h2>
 
@@ -50,17 +87,9 @@
 
 <div class="headerRight">
 
-<button id="themeBtn">
+<button id="themeBtn">🌙</button>
 
-🌙
-
-</button>
-
-<button id="settingBtn">
-
-⚙️
-
-</button>
+<button id="settingBtn">⚙️</button>
 
 </div>
 
@@ -73,18 +102,14 @@
 <div class="searchBox">
 
 <input
-
-type="text"
-
 id="searchInput"
+type="text"
+placeholder="ស្វែងរកបទចម្រៀង...">
 
-placeholder="ស្វែងរកបទចម្រៀង Artist Album..."
+<button
+id="voiceSearch">
 
->
-
-<button>
-
-🔍
+🎤
 
 </button>
 
@@ -94,7 +119,7 @@ placeholder="ស្វែងរកបទចម្រៀង Artist Album..."
 
 <!-- Home -->
 
-<main>
+<main id="homePage">
 
 <!-- Trending -->
 
@@ -102,27 +127,13 @@ placeholder="ស្វែងរកបទចម្រៀង Artist Album..."
 
 <div class="titleRow">
 
-<h2>
-
-🔥 Trending
-
-</h2>
-
-<a>
-
-See All
-
-</a>
+<h2>🔥 Trending</h2>
 
 </div>
 
 <div
-
 id="trendingSongs"
-
-class="horizontalList"
-
->
+class="horizontalList">
 
 </div>
 
@@ -134,123 +145,49 @@ class="horizontalList"
 
 <div class="titleRow">
 
-<h2>
-
-❤️ Recommended
-
-</h2>
-
-<a>
-
-See All
-
-</a>
+<h2>✨ Recommended</h2>
 
 </div>
 
 <div
-
 id="recommendedSongs"
-
-class="horizontalList"
-
->
+class="horizontalList">
 
 </div>
 
 </section>
 
-<!-- New -->
+<!-- Most Played -->
 
 <section>
 
 <div class="titleRow">
 
-<h2>
-
-🆕 New Songs
-
-</h2>
-
-<a>
-
-See All
-
-</a>
+<h2>🎧 Most Played</h2>
 
 </div>
 
 <div
-
-id="newSongs"
-
-class="horizontalList"
-
->
+id="mostPlayedSongs"
+class="horizontalList">
 
 </div>
 
 </section>
 
-<!-- Artists -->
+<!-- Recently Added -->
 
 <section>
 
 <div class="titleRow">
 
-<h2>
-
-🎤 Artists
-
-</h2>
-
-<a>
-
-See All
-
-</a>
+<h2>🆕 Recently Added</h2>
 
 </div>
 
 <div
-
-id="artistList"
-
-class="artistGrid"
-
->
-
-</div>
-
-</section>
-
-<!-- Albums -->
-
-<section>
-
-<div class="titleRow">
-
-<h2>
-
-💿 Albums
-
-</h2>
-
-<a>
-
-See All
-
-</a>
-
-</div>
-
-<div
-
-id="albumList"
-
-class="albumGrid"
-
->
+id="recentSongs"
+class="horizontalList">
 
 </div>
 
@@ -262,21 +199,50 @@ class="albumGrid"
 
 <div class="titleRow">
 
-<h2>
-
-🎲 Discover
-
-</h2>
+<h2>🎵 Discover</h2>
 
 </div>
 
 <div
-
 id="discoverSongs"
+class="songGrid">
 
-class="songGrid"
+</div>
 
->
+<div id="pagination"></div>
+
+</section>
+<!-- Artists -->
+
+<section>
+
+<div class="titleRow">
+
+<h2>🎤 Artists</h2>
+
+</div>
+
+<div
+id="artistList"
+class="artistGrid">
+
+</div>
+
+</section>
+
+<!-- Albums -->
+
+<section>
+
+<div class="titleRow">
+
+<h2>💿 Albums</h2>
+
+</div>
+
+<div
+id="albumList"
+class="albumGrid">
 
 </div>
 
@@ -284,51 +250,237 @@ class="songGrid"
 
 </main>
 
-<!-- Mini Player -->
+<!-- ========================= -->
+<!-- Search Page -->
+<!-- ========================= -->
 
-<div id="miniPlayer">
+<section
+id="searchPage"
+style="display:none;">
 
-<img
+<div class="pageHeader">
 
-id="miniCover"
-
-src="assets/default.png"
-
->
-
-<div class="miniInfo">
-
-<h3 id="miniTitle">
-
-No Song
-
-</h3>
-
-<p id="miniArtist">
-
--
-
-</p>
+<h2>🔍 Search</h2>
 
 </div>
 
-<div class="miniButtons">
+<div
+id="searchResults"
+class="songGrid">
 
-<button id="miniPlay">
+</div>
 
-▶
+</section>
+
+<!-- ========================= -->
+<!-- Library -->
+<!-- ========================= -->
+
+<section
+id="libraryPage"
+style="display:none;">
+
+<div class="pageHeader">
+
+<h2>📚 Library</h2>
+
+</div>
+
+<div class="libraryMenu">
+
+<div
+id="historyCard"
+class="libraryCard">
+
+<span>🕒</span>
+
+<h3>History</h3>
+
+<p>Recently Played</p>
+
+</div>
+
+<div
+id="likedCard"
+class="libraryCard">
+
+<span>❤️</span>
+
+<h3>Liked Songs</h3>
+
+<p>Your Favorites</p>
+
+</div>
+
+<div
+id="downloadCard"
+class="libraryCard">
+
+<span>⬇️</span>
+
+<h3>Downloads</h3>
+
+<p>Offline Songs</p>
+
+</div>
+
+<div
+id="playlistCard"
+class="libraryCard">
+
+<span>🎵</span>
+
+<h3>Playlists</h3>
+
+<p>Your Collection</p>
+
+</div>
+
+</div>
+
+<div
+id="librarySongs"
+class="songGrid">
+
+</div>
+
+</section>
+
+<!-- ========================= -->
+<!-- Profile -->
+<!-- ========================= -->
+
+<section
+id="profilePage"
+style="display:none;">
+
+<div class="profileTop">
+
+<img
+id="profileAvatar"
+src="assets/logo.png">
+
+<h2>Melodify User</h2>
+
+<p>Enjoy your music.</p>
+
+</div>
+
+<div class="profileStats">
+
+<div>
+
+<h3
+id="likedCount">
+
+0
+
+</h3>
+
+<p>Liked</p>
+
+</div>
+
+<div>
+
+<h3
+id="totalPlayed">
+
+0
+
+</h3>
+
+<p>Played</p>
+
+</div>
+
+<div>
+
+<h3
+id="downloadCount">
+
+0
+
+</h3>
+
+<p>Downloads</p>
+
+</div>
+
+</div>
+
+<div class="profileMenu">
+
+<button id="artistCard">
+
+🎤 Favorite Artist
+
+</button>
+
+<button id="albumCard">
+
+💿 Albums
+
+</button>
+
+<button id="settingOpen">
+
+⚙️ Settings
 
 </button>
 
 </div>
 
+    </section>
+    <!-- ========================= -->
+<!-- Queue Panel -->
+<!-- ========================= -->
+
+<div id="queuePanel">
+
+<div class="queueHeader">
+
+<h2>🎵 Up Next</h2>
+
+<button id="closeQueue">✕</button>
+
 </div>
 
+<div id="queueSongs"></div>
+
+</div>
+
+<!-- ========================= -->
+<!-- Mini Player -->
+<!-- ========================= -->
+
+<div id="miniPlayer" style="display:none;">
+
+<img
+id="miniCover"
+src="assets/logo.png">
+
+<div class="miniInfo">
+
+<h3 id="miniTitle">Title</h3>
+
+<p id="miniArtist">Artist</p>
+
+</div>
+
+<div class="miniButtons">
+
+<button id="miniPlay">▶</button>
+
+</div>
+
+</div>
+
+<!-- ========================= -->
 <!-- Full Player -->
+<!-- ========================= -->
 
-<div id="playerPage">
-
-<div class="playerHeader">
+<section id="playerPage">
 
 <button id="closePlayer">
 
@@ -336,61 +488,38 @@ No Song
 
 </button>
 
-<h3>
-
-Now Playing
-
-</h3>
-
-<div></div>
-
-</div>
-
-<div class="coverArea">
-
 <div class="coverDisc">
 
 <img
-
 id="playerCover"
-
-src="assets/default.png"
-
->
-
-</div>
+src="assets/logo.png">
 
 </div>
 
 <h2 id="playerTitle">
 
-No Song
+Song Title
 
 </h2>
 
 <p id="playerArtist">
 
--
+Artist
 
 </p>
 
-<div class="progressArea">
+<input
+type="range"
+id="seekBar"
+value="0">
+
+<div class="timeRow">
 
 <span id="currentTime">
 
 0:00
 
 </span>
-
-<input
-
-type="range"
-
-id="seekBar"
-
-value="0"
-
->
 
 <span id="duration">
 
@@ -400,7 +529,7 @@ value="0"
 
 </div>
 
-<div class="controlButtons">
+<div class="playerControls">
 
 <button id="shuffleBtn">
 
@@ -434,41 +563,33 @@ value="0"
 
 </div>
 
-<div class="actionButtons">
+<div class="playerActions">
 
-<button>
+<button id="likeSong">
 
 ❤️
 
 </button>
 
-<button>
+<button id="downloadSong">
 
-⬇
+⬇️
 
 </button>
 
-<button>
+<button id="shareSong">
 
 📤
 
 </button>
 
-<button>
+<button id="addQueue">
 
-🎤
+➕
 
 </button>
 
 </div>
-
-<div id="lyricsBox">
-
-<h3>
-
-Lyrics
-
-</h3>
 
 <div id="lyrics">
 
@@ -476,541 +597,186 @@ No Lyrics
 
 </div>
 
-</div>
-
-</div>
-
-<!-- Bottom Navigation -->
-
-<nav>
-
-<button class="active">
-
-🏠
-
-<p>
-
-Home
-
-</p>
-
-</button>
-
-<button>
-
-🔍
-
-<p>
-
-Search
-
-</p>
-
-</button>
-
-<button>
-
-❤️
-
-<p>
-
-Library
-
-</p>
-
-</button>
-
-<button>
-
-👤
-
-<p>
-
-Profile
-
-</p>
-
-</button>
-
-</nav>
-
-<audio id="audio"></audio>
-
-<script src="app.js"></script>
-<!-- ===================== LIBRARY PAGE ===================== -->
-
-<section id="libraryPage" class="page">
-
-<div class="pageHeader">
-
-<h2>❤️ Library</h2>
-
-</div>
-
-<div class="libraryMenu">
-
-<div class="libraryCard" id="historyCard">
-
-<span>🕒</span>
-
-<h3>History</h3>
-
-<p>Recently Played Songs</p>
-
-</div>
-
-<div class="
-  libraryCard" id="likedCard">
-
-<span>❤️</span>
-
-<h3>Liked Songs</h3>
-
-<p>Your Favorite Songs</p>
-
-</div>
-
-<div class="libraryCard" id="downloadCard">
-
-<span>⬇️</span>
-
-<h3>Downloads</h3>
-
-<p>Offline Music</p>
-
-</div>
-
-<div class="libraryCard" id="artistCard">
-
-<span>🎤</span>
-
-<h3>Artists</h3>
-
-<p>Favorite Artists</p>
-
-</div>
-
-<div class="libraryCard" id="albumCard">
-
-<span>💿</span>
-
-<h3>Albums</h3>
-
-<p>Browse Albums</p>
-
-</div>
-
-</div>
-
-<div id="librarySongs" class="songGrid"></div>
-
 </section>
-
-<!-- ===================== SEARCH PAGE ===================== -->
-
-<section id="searchPage" class="page">
-
-<div class="pageHeader">
-
-<h2>🔍 Search</h2>
-
-</div>
-
-<div class="searchContainer">
-
-<input
-type="text"
-id="globalSearch"
-placeholder="ស្វែងរកបទចម្រៀង Artist Album..."
-autocomplete="off">
-
-</div>
-
-<div id="searchSuggestion"></div>
-
-<div id="searchResult" class="songGrid"></div>
-
-</section>
-
-<!-- ===================== PROFILE PAGE ===================== -->
-
-<section id="profilePage" class="page">
-
-<div class="profileTop">
-
-<img
-src="assets/default-avatar.png"
-id="profileAvatar">
-
-<h2>Guest</h2>
-
-<p>Welcome to MelodifyKH</p>
-
-</div>
-
-<div class="profileStats">
-
-<div>
-
-<h3 id="totalPlayed">
-
-0
-
-</h3>
-
-<p>Played</p>
-
-</div>
-
-<div>
-
-<h3 id="likedCount">
-
-0
-
-</h3>
-
-<p>Liked</p>
-
-</div>
-
-<div>
-
-<h3 id="downloadCount">
-
-0
-
-</h3>
-
-<p>Downloads</p>
-
-</div>
-
-</div>
-
-<div class="profileMenu">
-
-<button id="themeButton">
-
-🌙 Dark Mode
-
-</button>
-
-<button id="clearHistory">
-
-🗑 Clear History
-
-</button>
-
-<button id="aboutButton">
-
-ℹ️ About
-
-</button>
-
-</div>
-
-</section>
-
-<!-- ===================== TOAST ===================== -->
-
-<div id="toast"></div>
-
-<!-- ===================== LOADING ===================== -->
-
-<div id="loading">
-
-<div class="loader"></div>
-
-<p>Loading...</p>
-
-</div>
-
-<!-- ===================== QUEUE ===================== -->
-
-<div id="queuePanel">
-
-<div class="queueHeader">
-
-<h2>🎵 Up Next</h2>
-
-<button id="closeQueue">
-
-✖
-
-</button>
-
-</div>
-
-<div id="queueSongs"></div>
-
-</div>
-  <!-- ================= SETTINGS ================= -->
+<!-- ========================= -->
+<!-- Settings Modal -->
+<!-- ========================= -->
 
 <div id="settingsModal" class="modal hidden">
 
-    <div class="modal-content">
+<div class="modal-content">
 
-        <div class="modal-header">
-            <h2>⚙️ Settings</h2>
-            <button id="closeSettings">✕</button>
-        </div>
+<div class="modal-header">
 
-        <div class="setting-item">
-            <span>🌙 Dark Mode</span>
-            <label class="switch">
-                <input type="checkbox" id="darkSwitch">
-                <span class="slider"></span>
-            </label>
-        </div>
+<h2>⚙️ Settings</h2>
 
-        <div class="setting-item">
-            <span>🔔 Notification</span>
-            <label class="switch">
-                <input type="checkbox" id="notificationSwitch">
-                <span class="slider"></span>
-            </label>
-        </div>
-
-        <div class="setting-item">
-            <span>🎵 Auto Play</span>
-            <label class="switch">
-                <input type="checkbox" id="autoplaySwitch">
-                <span class="slider"></span>
-            </label>
-        </div>
-
-        <div class="setting-item">
-            <span>📥 High Quality</span>
-            <label class="switch">
-                <input type="checkbox" id="hqSwitch">
-                <span class="slider"></span>
-            </label>
-        </div>
-
-    </div>
+<button id="closeSettings">✕</button>
 
 </div>
 
-<!-- ================= SHARE MODAL ================= -->
+<div class="setting-item">
 
-<div id="shareModal" class="modal hidden">
+<span>🌙 Dark Mode</span>
 
-    <div class="modal-content">
+<label class="switch">
 
-        <div class="modal-header">
+<input type="checkbox" id="darkSwitch">
 
-            <h2>📤 Share Song</h2>
+<span class="slider"></span>
 
-            <button id="closeShare">
-                ✕
-            </button>
-
-        </div>
-
-        <button id="copyLinkBtn">
-            🔗 Copy Link
-        </button>
-
-        <button id="telegramBtn">
-            📨 Telegram
-        </button>
-
-        <button id="facebookBtn">
-            📘 Facebook
-        </button>
-
-    </div>
+</label>
 
 </div>
 
-<!-- ================= ABOUT ================= -->
+<div class="setting-item">
 
-<div id="aboutModal" class="modal hidden">
+<span>🔀 Shuffle</span>
 
-    <div class="modal-content">
+<label class="switch">
 
-        <img src="assets/logo.png" class="aboutLogo">
+<input type="checkbox" id="shuffleSwitch">
 
-        <h2>MelodifyKH</h2>
+<span class="slider"></span>
 
-        <p>
-            Khme
-          r Music Streaming Platform
-        </p>
-
-        <p>
-            Version 3.0
-        </p>
-
-        <p>
-            Made with ❤️ in Cambodia
-        </p>
-
-    </div>
+</label>
 
 </div>
 
-<!-- ================= SCROLL TO TOP ================= -->
+<div class="setting-item">
 
-<button id="scrollTopBtn">
+<span>🔁 Repeat</span>
 
-⬆️
+<label class="switch">
+
+<input type="checkbox" id="repeatSwitch">
+
+<span class="slider"></span>
+
+</label>
+
+</div>
+
+<div class="setting-item">
+
+<span>🔔 Notification</span>
+
+<label class="switch">
+
+<input type="checkbox" id="notificationSwitch">
+
+<span class="slider"></span>
+
+</label>
+
+</div>
+
+<div class="setting-item">
+
+<span>📲 Install App</span>
+
+<button id="installBtn">
+
+Install
 
 </button>
 
-  <!-- ================= INSTALL APP ================= -->
+</div>
 
-<div id="installPrompt" class="glass-card hidden">
+<div class="setting-item">
 
-    <div class="install-left">
+<span>😴 Sleep Timer</span>
 
-        <img
-            src="assets/logo.png"
-            alt="MelodifyKH"
-            class="install-logo">
+<button id="openSleep">
 
-        <div>
+Open
 
-            <h3>Install MelodifyKH</h3>
-
-            <p>ដំឡើងជា App លើទូរស័ព្ទ</p>
-
-        </div>
-
-    </div>
-
-    <button id="installBtn">
-        Install
-    </button>
+</button>
 
 </div>
 
-<!-- ================= SLEEP TIMER ================= -->
+</div>
+
+</div>
+
+<!-- ========================= -->
+<!-- Sleep Timer -->
+<!-- ========================= -->
 
 <div id="sleepModal" class="modal hidden">
 
-    <div class="modal-content">
+<div class="modal-content">
 
-        <div class="modal-header">
+<div class="modal-header">
 
-            <h2>😴 Sleep Timer</h2>
+<h2>😴 Sleep Timer</h2>
 
-            <button id="closeSleep">
-                ✕
-            </button>
-
-        </div>
-
-        <div class="sleep-list">
-
-            <button data-time="5">
-                5 Minutes
-            </button>
-
-            <button data-time="10">
-                10 Minutes
-            </button>
-
-            <button data-time="15">
-                15 Minutes
-            </button>
-
-            <button data-time="30">
-                30 Minutes
-            </button>
-
-            <button data-time="60">
-                1 Hour
-            </button>
-
-            <button data-time="0">
-                Cancel
-            </button>
-
-        </div>
-
-    </div>
+<button id="closeSleep">✕</button>
 
 </div>
 
-<!-- ================= EQUALIZER ================= -->
+<div class="sleep-list">
 
-<div id="equalizer">
+<button data-time="10">10 Minutes</button>
 
-    <span></span>
+<button data-time="20">20 Minutes</button>
 
-    <span></span>
+<button data-time="30">30 Minutes</button>
 
-    <span></span>
+<button data-time="60">60 Minutes</button>
 
-    <span></span>
-
-    <span></span>
+<button data-time="0">Cancel</button>
 
 </div>
 
-<!-- ================= OFFLINE ================= -->
+</div>
+
+</div>
+
+<!-- ========================= -->
+<!-- Offline Banner -->
+<!-- ========================= -->
 
 <div id="offlineBanner" class="hidden">
 
-📡 Offline Mode
+📡 No Internet Connection
 
 </div>
-
-<!-- ================= ONLINE ================= -->
 
 <div id="onlineBanner" class="hidden">
 
-✅ Back Online
+✅ Connected
 
 </div>
 
-<!-- ================= CONTEXT MENU ================= -->
+<!-- ========================= -->
+<!-- Install Prompt -->
+<!-- ========================= -->
 
-<div id="songMenu" class="hidden">
+<div id="installPrompt" class="hidden">
 
-    <button id="playNext">
+<p>
 
-        ▶️ Play Next
+Install MelodifyKH App?
 
-    </button>
+</p>
 
-    <button id="addQueue">
+<button id="installBtn">
 
-        🎵 Add to Queue
+Install
 
-    </button>
-
-    <button id="likeSong">
-
-        ❤️ Like
-
-    </button>
-
-    <button id="downloadSong">
-
-        ⬇️ Download
-
-    </button>
-
-    <button id="shareSong">
-
-        📤 Share
-
-    </button>
-
-    <button id="songInfo">
-
-        ℹ️ Song Info
-
-    </button>
+</button>
 
 </div>
 
-<!-- ================= END ================= -->
+<!-- ========================= -->
+<!-- Audio -->
+<!-- ========================= -->
 
 <audio id="audio"></audio>
+
+<!-- ========================= -->
+<!-- Scripts -->
+<!-- ========================= -->
 
 <script src="app.js"></script>
 
