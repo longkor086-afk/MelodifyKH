@@ -1354,3 +1354,1764 @@ JSON.stringify(downloads)
 );
 
 }
+// ======================================================
+// MelodifyKH V3
+// app.js PART 8
+// Artist + Album + Recommendation + Theme
+// ======================================================
+
+// ---------------- Artist ----------------
+
+function renderArtists(){
+
+const artists=[...new Set(allSongs.map(s=>s.artist).filter(Boolean))];
+
+const box=document.getElementById("artistList");
+
+if(!box) return;
+
+box.innerHTML="";
+
+artists.forEach(name=>{
+
+const songs=allSongs.filter(s=>s.artist===name);
+
+const card=document.createElement("div");
+
+card.className="artistCard";
+
+card.innerHTML=`
+
+<img src="${songs[0]?.cover||'assets/default.png'}">
+
+<h4>${escapeHtml(name)}</h4>
+
+`;
+
+card.onclick=()=>{
+
+filteredSongs=songs;
+
+currentRenderPage=1;
+
+renderDiscover();
+
+showPage("home");
+
+navButtons[0].classList.add("active");
+
+};
+
+box.appendChild(card);
+
+});
+
+}
+
+// ---------------- Album ----------------
+
+function renderAlbums(){
+
+const albums=[...new Set(
+
+allSongs
+
+.filter(s=>s.album)
+
+.map(s=>s.album)
+
+)];
+
+const box=document.getElementById("albumList");
+
+if(!box) return;
+
+box.innerHTML="";
+
+albums.forEach(album=>{
+
+const songs=allSongs.filter(s=>s.album===album);
+
+const card=document.createElement("div");
+
+card.className="albumCard";
+
+card.innerHTML=`
+
+<img src="${songs[0]?.cover||'assets/default.png'}">
+
+<h3>${escapeHtml(album)}</h3>
+
+<p>${songs.length} Songs</p>
+
+`;
+
+card.onclick=()=>{
+
+filteredSongs=songs;
+
+currentRenderPage=1;
+
+renderDiscover();
+
+showPage("home");
+
+navButtons[0].classList.add("active");
+
+};
+
+box.appendChild(card);
+
+});
+
+}
+
+// ---------------- Recommendation ----------------
+
+function renderRecommended(){
+
+const history=
+
+JSON.parse(
+
+localStorage.getItem("history")
+
+)||[];
+
+let recommend=[];
+
+if(history.length){
+
+const favArtist=history[0].artist;
+
+recommend=
+
+allSongs.filter(
+
+s=>s.artist===favArtist
+
+);
+
+}
+
+if(recommend.length<10){
+
+recommend=[
+
+...recommend,
+
+...allSongs.sort(()=>Math.random()-0.5)
+
+];
+
+}
+
+recommendedSongs.innerHTML="";
+
+recommend
+
+.slice(0,10)
+
+.forEach(song=>{
+
+recommendedSongs.appendChild(
+
+createSongCard(song)
+
+);
+
+});
+
+}
+
+// ---------------- Theme ----------------
+
+const themeBtn=document.getElementById("themeBtn");
+
+if(themeBtn){
+
+themeBtn.onclick=toggleTheme;
+
+}
+
+function toggleTheme(){
+
+document.body.classList.toggle("light");
+
+localStorage.setItem(
+
+"theme",
+
+document.body.classList.contains("light")
+
+?"light"
+
+:"dark"
+
+);
+
+}
+
+if(localStorage.getItem("theme")==="light"){
+
+document.body.classList.add("light");
+
+}
+
+// ---------------- Init ----------------
+
+window.addEventListener("load",()=>{
+
+renderArtists();
+
+renderAlbums();
+
+renderRecommended();
+
+});
+// ======================================================
+// MelodifyKH V3
+// app.js PART 9
+// Queue + Sleep Timer + Media Session + Keyboard
+// ======================================================
+
+// ---------------- Queue ----------------
+
+let playQueue=[];
+
+function addQueue(song){
+
+playQueue.push(song);
+
+renderQueue();
+
+}
+
+function renderQueue(){
+
+const box=document.getElementById("queueSongs");
+
+if(!box) return;
+
+box.innerHTML="";
+
+playQueue.forEach((song,index)=>{
+
+const item=document.createElement("div");
+
+item.className="queueSong";
+
+item.innerHTML=`
+
+<img src="${song.cover||'assets/default.png'}">
+
+<div class="queueSongInfo">
+
+<h3>${escapeHtml(song.title)}</h3>
+
+<p>${escapeHtml(song.artist)}</p>
+
+</div>
+
+`;
+
+item.onclick=()=>{
+
+playSong(song);
+
+playQueue.splice(index,1);
+
+renderQueue();
+
+};
+
+box.appendChild(item);
+
+});
+
+}
+
+audio.addEventListener("ended",()=>{
+
+if(playQueue.length){
+
+const next=playQueue.shift();
+
+renderQueue();
+
+playSong(next);
+
+}
+
+});
+
+// ---------------- Sleep Timer ----------------
+
+let sleepTimer=null;
+
+document.querySelectorAll(".sleep-list button")
+
+.forEach(btn=>{
+
+btn.onclick=()=>{
+
+const min=parseInt(btn.dataset.time);
+
+clearTimeout(sleepTimer);
+
+if(min!==0){
+
+sleepTimer=setTimeout(()=>{
+
+audio.pause();
+
+showToast("😴 Sleep Timer Finished");
+
+},min*60000);
+
+}
+
+document.getElementById("sleepModal")
+
+.classList.add("hidden");
+
+};
+
+});
+
+// ---------------- Media Session ----------------
+
+if("mediaSession" in navigator){
+
+navigator.mediaSession.setActionHandler(
+
+"play",
+
+()=>audio.play()
+
+);
+
+navigator.mediaSession.setActionHandler(
+
+"pause",
+
+()=>audio.pause()
+
+);
+
+navigator.mediaSession.setActionHandler(
+
+"nexttrack",
+
+()=>nextSong()
+
+);
+
+navigator.mediaSession.setActionHandler(
+
+"previoustrack",
+
+()=>prevSong()
+
+);
+
+}
+
+audio.addEventListener("play",()=>{
+
+if(currentSong && "mediaSession" in navigator){
+
+navigator.mediaSession.metadata=
+
+new MediaMetadata({
+
+title:currentSong.title,
+
+artist:currentSong.artist,
+
+artwork:[
+
+{
+
+src:currentSong.cover,
+
+sizes:"512x512",
+
+type:"image/jpeg"
+
+}
+
+]
+
+});
+
+}
+
+});
+
+// ---------------- Keyboard ----------------
+
+document.addEventListener("keydown",e=>{
+
+switch(e.code){
+
+case"Space":
+
+e.preventDefault();
+
+togglePlay();
+
+break;
+
+case"ArrowRight":
+
+nextSong();
+
+break;
+
+case"ArrowLeft":
+
+prevSong();
+
+break;
+
+}
+
+});
+
+// ---------------- Queue Button ----------------
+
+document.getElementById("addQueue")
+
+?.addEventListener("click",()=>{
+
+if(currentSong){
+
+addQueue(currentSong);
+
+showToast("🎵 Added To Queue");
+
+}
+
+});
+// ======================================================
+// MelodifyKH V3
+// app.js PART 10
+// Offline + PWA + Infinite Scroll + Continue Playing
+// ======================================================
+
+// ---------------- Continue Playing ----------------
+
+audio.addEventListener("pause",()=>{
+
+localStorage.setItem("lastTime",audio.currentTime);
+
+if(currentSong){
+
+localStorage.setItem(
+
+"lastSong",
+
+currentSong.id
+
+);
+
+}
+
+});
+
+window.addEventListener("load",()=>{
+
+const id=localStorage.getItem("lastSong");
+
+const time=parseFloat(
+
+localStorage.getItem("lastTime")||0
+
+);
+
+if(id){
+
+const song=allSongs.find(s=>s.id===id);
+
+if(song){
+
+currentSong=song;
+
+currentIndex=allSongs.indexOf(song);
+
+audio.src=
+
+"https://melodify-api-2mag.onrender.com/song/"+
+
+song.file_id;
+
+updatePlayer();
+
+audio.currentTime=time;
+
+}
+
+}
+
+});
+
+// ---------------- Infinite Scroll ----------------
+
+window.addEventListener("scroll",()=>{
+
+if(
+
+window.innerHeight+
+
+window.scrollY>=
+
+document.body.offsetHeight-300
+
+){
+
+const total=
+
+Math.ceil(filteredSongs.length/SONG_PER_PAGE);
+
+if(currentRenderPage<total){
+
+currentRenderPage++;
+
+const start=
+
+(currentRenderPage-1)*SONG_PER_PAGE;
+
+const end=start+SONG_PER_PAGE;
+
+filteredSongs
+
+.slice(start,end)
+
+.forEach(song=>{
+
+discoverSongs.appendChild(
+
+createGridCard(song)
+
+);
+
+});
+
+}
+
+}
+
+});
+
+// ---------------- Offline ----------------
+
+window.addEventListener("offline",()=>{
+
+document.getElementById("offlineBanner")
+
+.classList.remove("hidden");
+
+});
+
+window.addEventListener("online",()=>{
+
+document.getElementById("offlineBanner")
+
+.classList.add("hidden");
+
+document.getElementById("onlineBanner")
+
+.classList.remove("hidden");
+
+setTimeout(()=>{
+
+document.getElementById("onlineBanner")
+
+.classList.add("hidden");
+
+},3000);
+
+});
+
+// ---------------- Install App ----------------
+
+let deferredPrompt=null;
+
+window.addEventListener(
+
+"beforeinstallprompt",
+
+e=>{
+
+e.preventDefault();
+
+deferredPrompt=e;
+
+document.getElementById("installPrompt")
+
+.classList.remove("hidden");
+
+});
+
+document.getElementById("installBtn")
+
+?.addEventListener("click",async()=>{
+
+if(!deferredPrompt) return;
+
+deferredPrompt.prompt();
+
+await deferredPrompt.userChoice;
+
+deferredPrompt=null;
+
+document.getElementById("installPrompt")
+
+.classList.add("hidden");
+
+});
+
+// ---------------- Register SW ----------------
+
+if("serviceWorker" in navigator){
+
+window.addEventListener("load",()=>{
+
+navigator.serviceWorker.register(
+
+"service-worker.js"
+
+)
+
+.then(()=>{
+
+console.log("SW Registered");
+
+})
+
+.catch(console.error);
+
+});
+
+}
+
+// ---------------- Auto Save Volume ----------------
+
+audio.volume=parseFloat(
+
+localStorage.getItem("volume")||1
+
+);
+
+audio.addEventListener("volumechange",()=>{
+
+localStorage.setItem(
+
+"volume",
+
+audio.volume
+
+);
+
+});
+
+// ======================================================
+// END PART 10
+// ======================================================
+// ======================================================
+// MelodifyKH V3
+// app.js PART 11
+// AI Recommendation + Trending + Most Played
+// ======================================================
+
+// ---------------- Play Counter ----------------
+
+let playCounter = JSON.parse(
+    localStorage.getItem("playCounter")
+) || {};
+
+function increasePlay(song){
+
+    if(!song) return;
+
+    playCounter[song.id] =
+        (playCounter[song.id] || 0) + 1;
+
+    localStorage.setItem(
+        "playCounter",
+        JSON.stringify(playCounter)
+    );
+
+}
+
+audio.addEventListener("play",()=>{
+
+    if(currentSong){
+
+        increasePlay(currentSong);
+
+    }
+
+});
+
+// ---------------- Trending ----------------
+
+function renderTrending(){
+
+    trendingSongs.innerHTML="";
+
+    const list=[...allSongs]
+
+    .sort((a,b)=>{
+
+        return (playCounter[b.id]||0) -
+
+               (playCounter[a.id]||0);
+
+    })
+
+    .slice(0,10);
+
+    list.forEach(song=>{
+
+        trendingSongs.appendChild(
+
+            createSongCard(song)
+
+        );
+
+    });
+
+}
+
+// ---------------- Most Played ----------------
+
+function renderMostPlayed(){
+
+    const box=document.getElementById("mostPlayedSongs");
+
+    if(!box) return;
+
+    box.innerHTML="";
+
+    [...allSongs]
+
+    .sort((a,b)=>{
+
+        return (playCounter[b.id]||0)-
+
+               (playCounter[a.id]||0);
+
+    })
+
+    .slice(0,20)
+
+    .forEach(song=>{
+
+        box.appendChild(
+
+            createSongCard(song)
+
+        );
+
+    });
+
+}
+
+// ---------------- AI Recommendation ----------------
+
+function smartRecommend(){
+
+    const history = JSON.parse(
+
+        localStorage.getItem("history")
+
+    ) || [];
+
+    if(history.length===0){
+
+        renderRecommended();
+
+        return;
+
+    }
+
+    const artistCount={};
+
+    history.forEach(song=>{
+
+        artistCount[song.artist]=
+
+        (artistCount[song.artist]||0)+1;
+
+    });
+
+    const favArtist=
+
+    Object.keys(artistCount)
+
+    .sort((a,b)=>
+
+        artistCount[b]-artistCount[a]
+
+    )[0];
+
+    const recommend=
+
+    allSongs.filter(song=>
+
+        song.artist===favArtist
+
+    );
+
+    recommendedSongs.innerHTML="";
+
+    recommend.slice(0,10)
+
+    .forEach(song=>{
+
+        recommendedSongs.appendChild(
+
+            createSongCard(song)
+
+        );
+
+    });
+
+}
+
+// ---------------- Auto Follow Artist ----------------
+
+function getFavoriteArtist(){
+
+    const history=
+
+    JSON.parse(
+
+        localStorage.getItem("history")
+
+    )||[];
+
+    if(history.length===0)
+
+        return null;
+
+    const counter={};
+
+    history.forEach(song=>{
+
+        counter[song.artist]=
+
+        (counter[song.artist]||0)+1;
+
+    });
+
+    return Object.keys(counter)
+
+    .sort((a,b)=>
+
+        counter[b]-counter[a]
+
+    )[0];
+
+}
+
+// ---------------- Artist Badge ----------------
+
+function updateFavoriteArtist(){
+
+    const fav=getFavoriteArtist();
+
+    const profile=
+
+    document.getElementById("profilePage");
+
+    if(!profile||!fav) return;
+
+    let badge=
+
+    document.getElementById("favoriteArtist");
+
+    if(!badge){
+
+        badge=document.createElement("p");
+
+        badge.id="favoriteArtist";
+
+        profile.prepend(badge);
+
+    }
+
+    badge.innerHTML=
+
+    "🎤 Favorite Artist : "+fav;
+
+}
+
+// ---------------- Random Playlist ----------------
+
+function randomPlaylist(){
+
+    return [...allSongs]
+
+    .sort(()=>Math.random()-0.5)
+
+    .slice(0,30);
+
+}
+
+// ---------------- Refresh Home ----------------
+
+function refreshHome(){
+
+    renderTrending();
+
+    smartRecommend();
+
+    renderMostPlayed();
+
+    updateFavoriteArtist();
+
+}
+
+setInterval(refreshHome,30000);
+
+// ======================================================
+// END PART 11
+// ======================================================
+// ======================================================
+// MelodifyKH V3
+// app.js PART 12
+// Favorites + Recently Added + Voice Search + Dynamic Playlist
+// ======================================================
+
+// ---------------- Recently Added ----------------
+
+function renderRecentlyAdded(){
+
+const box=document.getElementById("recentSongs");
+
+if(!box) return;
+
+box.innerHTML="";
+
+const list=[...allSongs]
+
+.sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt))
+
+.slice(0,15);
+
+list.forEach(song=>{
+
+box.appendChild(createSongCard(song));
+
+});
+
+}
+
+// ---------------- Favorites Playlist ----------------
+
+function getFavoriteSongs(){
+
+const counter=JSON.parse(
+
+localStorage.getItem("playCounter")
+
+)||{};
+
+return [...allSongs]
+
+.sort((a,b)=>
+
+(counter[b.id]||0)-(counter[a.id]||0)
+
+)
+
+.slice(0,20);
+
+}
+
+function renderFavoriteSongs(){
+
+const box=document.getElementById("favoriteSongs");
+
+if(!box) return;
+
+box.innerHTML="";
+
+getFavoriteSongs().forEach(song=>{
+
+box.appendChild(createSongCard(song));
+
+});
+
+}
+
+// ---------------- Dynamic Playlist ----------------
+
+function createDynamicPlaylist(){
+
+const history=JSON.parse(
+
+localStorage.getItem("history")
+
+)||[];
+
+let playlist=[];
+
+history.forEach(song=>{
+
+playlist.push(
+
+...allSongs.filter(s=>
+
+s.artist===song.artist
+
+)
+
+);
+
+});
+
+playlist=[...new Map(
+
+playlist.map(s=>[s.id,s])
+
+).values()];
+
+return playlist;
+
+}
+
+// ---------------- Voice Search ----------------
+
+const SpeechRecognition=
+
+window.SpeechRecognition||
+
+window.webkitSpeechRecognition;
+
+if(SpeechRecognition){
+
+const recognition=new SpeechRecognition();
+
+recognition.lang="km-KH";
+
+recognition.onresult=e=>{
+
+const text=e.results[0][0].transcript;
+
+searchInput.value=text;
+
+smartSearch();
+
+};
+
+const voiceBtn=document.getElementById("voiceSearch");
+
+if(voiceBtn){
+
+voiceBtn.onclick=()=>recognition.start();
+
+}
+
+}
+
+// ---------------- Refresh ----------------
+
+window.addEventListener("load",()=>{
+
+renderRecentlyAdded();
+
+renderFavoriteSongs();
+
+});
+
+// ======================================================
+// END PART 12
+// ======================================================
+// ======================================================
+// MelodifyKH V3
+// app.js PART 13
+// Lyrics + Equalizer + Audio Cache + Continue Playlist
+// ======================================================
+
+// ---------------- Lyrics ----------------
+
+async function loadLyrics(song){
+
+const box=document.getElementById("lyrics");
+
+if(!box) return;
+
+if(song.lyrics){
+
+box.innerHTML=song.lyrics.replace(/\n/g,"<br>");
+
+}else{
+
+box.innerHTML="No Lyrics Available";
+
+}
+
+}
+
+// ---------------- Update Player ----------------
+
+const oldUpdatePlayer=updatePlayer;
+
+updatePlayer=function(){
+
+oldUpdatePlayer();
+
+loadLyrics(currentSong);
+
+updateMediaSession();
+
+};
+
+// ---------------- Equalizer ----------------
+
+const equalizer=document.getElementById("equalizer");
+
+audio.addEventListener("play",()=>{
+
+if(equalizer)
+
+equalizer.style.display="flex";
+
+});
+
+audio.addEventListener("pause",()=>{
+
+if(equalizer)
+
+equalizer.style.display="none";
+
+});
+
+// ---------------- Continue Playlist ----------------
+
+function playPlaylist(list,index=0){
+
+if(!list.length) return;
+
+playSong(list[index]);
+
+audio.onended=()=>{
+
+index++;
+
+if(index<list.length){
+
+playSong(list[index]);
+
+}else{
+
+nextSong();
+
+}
+
+};
+
+}
+
+// ---------------- Random Mix ----------------
+
+function playRandomMix(){
+
+const list=[...allSongs]
+
+.sort(()=>Math.random()-0.5)
+
+.slice(0,30);
+
+playPlaylist(list);
+
+}
+
+// ---------------- Favorite Mix ----------------
+
+function playFavoriteMix(){
+
+const list=getFavoriteSongs();
+
+playPlaylist(list);
+
+}
+
+// ---------------- Recently Played Mix ----------------
+
+function playHistoryMix(){
+
+const list=JSON.parse(
+
+localStorage.getItem("history")
+
+)||[];
+
+playPlaylist(list);
+
+}
+
+// ---------------- Audio Cache ----------------
+
+const audioCache={};
+
+function preloadSong(song){
+
+if(!song||audioCache[song.id]) return;
+
+const a=new Audio();
+
+a.src="https://melodify-api-2mag.onrender.com/song/"+song.file_id;
+
+audioCache[song.id]=a;
+
+}
+
+audio.addEventListener("play",()=>{
+
+if(currentIndex+1<allSongs.length){
+
+preloadSong(allSongs[currentIndex+1]);
+
+}
+
+});
+
+// ---------------- Favorite Artist Playlist ----------------
+
+function playFavoriteArtist(){
+
+const artist=getFavoriteArtist();
+
+if(!artist) return;
+
+const list=allSongs.filter(
+
+s=>s.artist===artist
+
+);
+
+playPlaylist(list);
+
+}
+
+// ======================================================
+// END PART 13
+// ======================================================
+// ======================================================
+// MelodifyKH V3
+// app.js PART 14
+// Smart Cache + Recently Played + Continue Play +
+// Auto Next Artist + Performance Boost
+// ======================================================
+
+// ---------------- Smart Cache ----------------
+
+const imageCache = {};
+
+function preloadImage(url){
+
+if(!url || imageCache[url]) return;
+
+const img=new Image();
+
+img.src=url;
+
+imageCache[url]=true;
+
+}
+
+// ---------------- Preload Next 5 Covers ----------------
+
+function preloadNextImages(){
+
+for(let i=currentIndex+1;i<currentIndex+6;i++){
+
+if(allSongs[i]){
+
+preloadImage(allSongs[i].cover);
+
+}
+
+}
+
+}
+
+audio.addEventListener("play",preloadNextImages);
+
+// ---------------- Continue Last Session ----------------
+
+window.addEventListener("load",()=>{
+
+const id=localStorage.getItem("lastSong");
+
+if(!id) return;
+
+const song=allSongs.find(s=>s.id===id);
+
+if(song){
+
+currentSong=song;
+
+currentIndex=allSongs.indexOf(song);
+
+updatePlayer();
+
+}
+
+});
+
+// ---------------- Recently Played ----------------
+
+function recentlyPlayed(){
+
+const history=
+
+JSON.parse(
+
+localStorage.getItem("history")
+
+)||[];
+
+return history.slice(0,15);
+
+}
+
+// ---------------- Favorite Genre ----------------
+
+function getFavoriteGenre(){
+
+const history=
+
+JSON.parse(
+
+localStorage.getItem("history")
+
+)||[];
+
+const count={};
+
+history.forEach(song=>{
+
+const genre=song.genre||"Unknown";
+
+count[genre]=(count[genre]||0)+1;
+
+});
+
+return Object.keys(count)
+
+.sort((a,b)=>count[b]-count[a])[0];
+
+}
+
+// ---------------- Smart Auto Next ----------------
+
+function smartNextSong(){
+
+const artist=getFavoriteArtist();
+
+const songs=
+
+allSongs.filter(
+
+s=>s.artist===artist
+
+);
+
+if(songs.length){
+
+playSong(
+
+songs[Math.floor(Math.random()*songs.length)]
+
+);
+
+}else{
+
+nextSong();
+
+}
+
+}
+
+// ---------------- Replace onEnded ----------------
+
+audio.onended=()=>{
+
+if(playQueue.length){
+
+const song=playQueue.shift();
+
+renderQueue();
+
+playSong(song);
+
+return;
+
+}
+
+if(isRepeat){
+
+audio.currentTime=0;
+
+audio.play();
+
+return;
+
+}
+
+smartNextSong();
+
+};
+
+// ---------------- RAM Cleaner ----------------
+
+setInterval(()=>{
+
+Object.keys(audioCache)
+
+.slice(10)
+
+.forEach(key=>{
+
+delete audioCache[key];
+
+});
+
+},300000);
+
+// ---------------- Performance ----------------
+
+function optimize(){
+
+document
+
+.querySelectorAll("img")
+
+.forEach(img=>{
+
+img.loading="lazy";
+
+img.decoding="async";
+
+});
+
+}
+
+window.addEventListener("load",optimize);
+
+// ---------------- Statistics ----------------
+
+function updateStatistics(){
+
+const played=
+
+JSON.parse(
+
+localStorage.getItem("history")
+
+)||[];
+
+localStorage.setItem(
+
+"statistics",
+
+JSON.stringify({
+
+played:played.length,
+
+liked:likedSongs.length,
+
+downloads:
+
+(JSON.parse(
+
+localStorage.getItem("downloads")
+
+)||[]).length,
+
+lastOpen:new Date()
+
+})
+
+);
+
+}
+
+setInterval(updateStatistics,60000);
+
+// ======================================================
+// END PART 14
+// ======================================================
+// ======================================================
+// MelodifyKH V3
+// app.js PART 15 (FINAL)
+// Playlist + Notification + Crossfade + Error Recovery
+// ======================================================
+
+// ---------------- Playlist ----------------
+
+let playlists = JSON.parse(
+localStorage.getItem("playlists")
+) || [];
+
+function createPlaylist(name){
+
+if(!name) return;
+
+playlists.push({
+
+id:"pl_"+Date.now(),
+
+name:name,
+
+songs:[]
+
+});
+
+savePlaylists();
+
+}
+
+function addSongToPlaylist(id,song){
+
+const p=playlists.find(x=>x.id===id);
+
+if(!p) return;
+
+if(!p.songs.find(s=>s.id===song.id)){
+
+p.songs.push(song);
+
+savePlaylists();
+
+showToast("✅ Added To Playlist");
+
+}
+
+}
+
+function savePlaylists(){
+
+localStorage.setItem(
+
+"playlists",
+
+JSON.stringify(playlists)
+
+);
+
+}
+
+// ---------------- Notification ----------------
+
+async function enableNotification(){
+
+if(!("Notification" in window)) return;
+
+if(Notification.permission==="default"){
+
+await Notification.requestPermission();
+
+}
+
+}
+
+audio.addEventListener("play",()=>{
+
+if(Notification.permission==="granted"&&currentSong){
+
+new Notification(currentSong.title,{
+
+body:currentSong.artist,
+
+icon:currentSong.cover
+
+});
+
+}
+
+});
+
+// ---------------- Crossfade ----------------
+
+let crossfadeTime=3;
+
+audio.addEventListener("timeupdate",()=>{
+
+if(
+
+audio.duration &&
+
+audio.duration-audio.currentTime<=crossfadeTime
+
+){
+
+if(playQueue.length){
+
+const next=playQueue[0];
+
+preloadSong(next);
+
+}
+
+}
+
+});
+
+// ---------------- Auto Resume ----------------
+
+document.addEventListener(
+
+"visibilitychange",
+
+()=>{
+
+if(
+
+!document.hidden &&
+
+currentSong &&
+
+isPlaying
+
+){
+
+audio.play().catch(()=>{});
+
+}
+
+});
+
+// ---------------- Error Recovery ----------------
+
+audio.addEventListener("error",()=>{
+
+showToast("❌ Cannot Play Song");
+
+setTimeout(()=>{
+
+nextSong();
+
+},1000);
+
+});
+
+// ---------------- Online Recovery ----------------
+
+window.addEventListener("online",()=>{
+
+showToast("✅ Internet Connected");
+
+});
+
+window.addEventListener("offline",()=>{
+
+showToast("📡 Offline");
+
+});
+
+// ---------------- Favorite Artist Shortcut ----------------
+
+const favArtistBtn=document.getElementById("artistCard");
+
+if(favArtistBtn){
+
+favArtistBtn.onclick=()=>{
+
+const artist=getFavoriteArtist();
+
+if(!artist) return;
+
+filteredSongs=allSongs.filter(
+
+s=>s.artist===artist
+
+);
+
+renderDiscover();
+
+showPage("home");
+
+};
+
+}
+
+// ---------------- Album Shortcut ----------------
+
+const albumBtn=document.getElementById("albumCard");
+
+if(albumBtn){
+
+albumBtn.onclick=()=>{
+
+renderAlbums();
+
+showPage("home");
+
+};
+
+}
+
+// ---------------- Random Discover ----------------
+
+function discoverRandom(){
+
+filteredSongs=[
+
+...allSongs
+
+]
+
+.sort(()=>Math.random()-0.5);
+
+renderDiscover();
+
+}
+
+// ---------------- Memory Cleanup ----------------
+
+setInterval(()=>{
+
+if(playQueue.length>100){
+
+playQueue.splice(100);
+
+}
+
+},300000);
+
+// ---------------- Startup ----------------
+
+window.addEventListener("load",()=>{
+
+enableNotification();
+
+optimize();
+
+renderArtists();
+
+renderAlbums();
+
+renderTrending();
+
+renderRecommended();
+
+renderDiscover();
+
+renderFavoriteSongs();
+
+renderRecentlyAdded();
+
+updateProfile();
+
+});
+
+// ======================================================
+// MelodifyKH V3 Finished
+// ======================================================
