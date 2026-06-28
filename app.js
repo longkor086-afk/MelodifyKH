@@ -882,3 +882,475 @@ splash.style.display="none";
 },1500);
 
 };
+// ======================================================
+// MelodifyKH V3
+// app.js PART 6
+// Smart Navigation + Library + Pagination
+// ======================================================
+
+// ---------- Pages ----------
+
+const pages = {
+    home: document.querySelector("main"),
+    search: document.getElementById("searchPage"),
+    library: document.getElementById("libraryPage"),
+    profile: document.getElementById("profilePage")
+};
+
+const navButtons = document.querySelectorAll("nav button");
+
+function showPage(page){
+
+    Object.values(pages).forEach(p=>{
+
+        if(p) p.style.display="none";
+
+    });
+
+    if(pages[page]){
+
+        pages[page].style.display="block";
+
+    }
+
+    navButtons.forEach(btn=>btn.classList.remove("active"));
+
+}
+
+navButtons[0].onclick=()=>{
+
+showPage("home");
+
+navButtons[0].classList.add("active");
+
+};
+
+navButtons[1].onclick=()=>{
+
+showPage("search");
+
+navButtons[1].classList.add("active");
+
+};
+
+navButtons[2].onclick=()=>{
+
+showPage("library");
+
+navButtons[2].classList.add("active");
+
+loadLibrary();
+
+};
+
+navButtons[3].onclick=()=>{
+
+showPage("profile");
+
+navButtons[3].classList.add("active");
+
+updateProfile();
+
+};
+
+showPage("home");
+navButtons[0].classList.add("active");
+
+// ======================================================
+// Pagination
+// ======================================================
+
+let currentRenderPage=1;
+
+const SONG_PER_PAGE=20;
+
+function renderDiscover(){
+
+discoverSongs.innerHTML="";
+
+const start=(currentRenderPage-1)*SONG_PER_PAGE;
+
+const end=start+SONG_PER_PAGE;
+
+filteredSongs
+
+.slice(start,end)
+
+.forEach(song=>{
+
+discoverSongs.appendChild(
+
+createGridCard(song)
+
+);
+
+});
+
+renderPagination();
+
+}
+
+function renderPagination(){
+
+let box=document.getElementById("pagination");
+
+if(!box){
+
+box=document.createElement("div");
+
+box.id="pagination";
+
+discoverSongs.after(box);
+
+}
+
+box.innerHTML="";
+
+const total=Math.ceil(filteredSongs.length/SONG_PER_PAGE);
+
+for(let i=1;i<=total;i++){
+
+const btn=document.createElement("button");
+
+btn.textContent=i;
+
+btn.className="pageBtn";
+
+if(i===currentRenderPage){
+
+btn.classList.add("active");
+
+}
+
+btn.onclick=()=>{
+
+currentRenderPage=i;
+
+renderDiscover();
+
+window.scrollTo({
+
+top:0,
+
+behavior:"smooth"
+
+});
+
+};
+
+box.appendChild(btn);
+
+}
+
+}
+
+// ======================================================
+// Library
+// ======================================================
+
+function loadLibrary(){
+
+const box=document.getElementById("librarySongs");
+
+if(!box) return;
+
+const liked=JSON.parse(
+
+localStorage.getItem("likedSongs")
+
+)||[];
+
+box.innerHTML="";
+
+if(liked.length===0){
+
+box.innerHTML="<h3>No liked songs.</h3>";
+
+return;
+
+}
+
+liked.forEach(song=>{
+
+box.appendChild(
+
+createGridCard(song)
+
+);
+
+});
+
+}
+
+// ======================================================
+// Profile
+// ======================================================
+
+function updateProfile(){
+
+document.getElementById("likedCount").textContent=
+
+(JSON.parse(localStorage.getItem("likedSongs"))||[]).length;
+
+document.getElementById("totalPlayed").textContent=
+
+(JSON.parse(localStorage.getItem("history"))||[]).length;
+
+document.getElementById("downloadCount").textContent=
+
+(JSON.parse(localStorage.getItem("downloads"))||[]).length;
+
+}
+// ======================================================
+// MelodifyKH V3
+// app.js PART 7
+// Smart Search + History + Liked + Downloads
+// ======================================================
+
+// ---------------- Smart Search ----------------
+
+const globalSearch=document.getElementById("globalSearch");
+
+if(globalSearch){
+
+globalSearch.addEventListener("input",smartSearch);
+
+}
+
+function smartSearch(){
+
+const keyword=globalSearch.value
+
+.toLowerCase()
+
+.trim();
+
+if(keyword===""){
+
+filteredSongs=[...allSongs];
+
+renderDiscover();
+
+return;
+
+}
+
+filteredSongs=allSongs.filter(song=>{
+
+const title=(song.title||"").toLowerCase();
+
+const artist=(song.artist||"").toLowerCase();
+
+const album=(song.album||"").toLowerCase();
+
+return(
+
+title.includes(keyword)||
+
+artist.includes(keyword)||
+
+album.includes(keyword)||
+
+levenshtein(keyword,title)<=2||
+
+levenshtein(keyword,artist)<=2
+
+);
+
+});
+
+currentRenderPage=1;
+
+renderDiscover();
+
+}
+
+// ---------------- Levenshtein ----------------
+
+function levenshtein(a,b){
+
+const matrix=[];
+
+for(let i=0;i<=b.length;i++){
+
+matrix[i]=[i];
+
+}
+
+for(let j=0;j<=a.length;j++){
+
+matrix[0][j]=j;
+
+}
+
+for(let i=1;i<=b.length;i++){
+
+for(let j=1;j<=a.length;j++){
+
+if(b.charAt(i-1)==a.charAt(j-1)){
+
+matrix[i][j]=matrix[i-1][j-1];
+
+}else{
+
+matrix[i][j]=Math.min(
+
+matrix[i-1][j-1]+1,
+
+matrix[i][j-1]+1,
+
+matrix[i-1][j]+1
+
+);
+
+}
+
+}
+
+}
+
+return matrix[b.length][a.length];
+
+}
+
+// ---------------- History ----------------
+
+function renderHistory(){
+
+const history=
+
+JSON.parse(
+
+localStorage.getItem("history")
+
+)||[];
+
+const box=document.getElementById("librarySongs");
+
+box.innerHTML="";
+
+history.forEach(song=>{
+
+box.appendChild(
+
+createGridCard(song)
+
+);
+
+});
+
+}
+
+document.getElementById("historyCard")
+
+?.addEventListener(
+
+"click",
+
+renderHistory
+
+);
+
+// ---------------- Liked ----------------
+
+function renderLiked(){
+
+const liked=
+
+JSON.parse(
+
+localStorage.getItem("likedSongs")
+
+)||[];
+
+const box=document.getElementById("librarySongs");
+
+box.innerHTML="";
+
+liked.forEach(song=>{
+
+box.appendChild(
+
+createGridCard(song)
+
+);
+
+});
+
+}
+
+document.getElementById("likedCard")
+
+?.addEventListener(
+
+"click",
+
+renderLiked
+
+);
+
+// ---------------- Downloads ----------------
+
+function renderDownloads(){
+
+const downloads=
+
+JSON.parse(
+
+localStorage.getItem("downloads")
+
+)||[];
+
+const box=document.getElementById("librarySongs");
+
+box.innerHTML="";
+
+downloads.forEach(song=>{
+
+box.appendChild(
+
+createGridCard(song)
+
+);
+
+});
+
+}
+
+document.getElementById("downloadCard")
+
+?.addEventListener(
+
+"click",
+
+renderDownloads
+
+);
+
+// ---------------- Save Download ----------------
+
+function saveDownload(song){
+
+let downloads=
+
+JSON.parse(
+
+localStorage.getItem("downloads")
+
+)||[];
+
+if(!downloads.find(s=>s.id===song.id)){
+
+downloads.unshift(song);
+
+}
+
+localStorage.setItem(
+
+"downloads",
+
+JSON.stringify(downloads)
+
+);
+
+}
