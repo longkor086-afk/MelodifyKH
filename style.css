@@ -1253,3 +1253,265 @@ padding:10px 20px;
 border-radius:12px;
 
 }
+/* ===================================================
+   MelodifyKH V3
+   style.css PART 6 (FINAL)
+   Responsive + Animation + Glass UI + Dark/Light
+=================================================== */
+
+/* Glass Effect */
+
+.glass{
+
+background:rgba(255,255,255,.08);
+
+backdrop-filter:blur(20px);
+
+border:1px solid rgba(255,255,255,.12);
+
+box-shadow:0 8px 30px rgba(0,0,0,.25);
+
+}
+
+/* Hover */
+
+button,
+.songCard,
+.artistCard,
+.albumCard,
+.libraryCard{
+
+transition:.25s ease;
+
+}
+
+button:active,
+.songCard:active,
+.artistCard:active,
+.albumCard:active,
+.libraryCard:active{
+
+transform:scale(.96);
+
+}
+
+/* Fade Animation */
+
+.fadeIn{
+
+animation:fadeIn .35s ease;
+
+}
+
+@keyframes fadeIn{
+
+from{
+
+opacity:0;
+
+transform:translateY(15px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:none;
+
+}
+
+}
+
+/* Rotate Disc */
+
+.rotate{
+
+animation:spin 12s linear infinite;
+
+}
+
+/* Player */
+
+.playing #playerCover{
+
+animation:spin 15s linear infinite;
+
+}
+
+/* Search Focus */
+
+.searchBox input:focus{
+
+outline:2px solid #8b5cf6;
+
+}
+
+/* Active */
+
+.activeCard{
+
+border:2px solid #8b5cf6;
+
+}
+
+/* Light Theme */
+
+body.light{
+
+background:#f7f7f7;
+
+color:#111;
+
+}
+
+body.light header{
+
+background:#ffffffdd;
+
+}
+
+body.light .songCard,
+body.light .albumCard,
+body.light .artistCard,
+body.light .libraryCard,
+body.light .modal-content,
+body.light #miniPlayer,
+body.light #queuePanel,
+body.light .profileStats div{
+
+background:#ffffff;
+
+color:#111;
+
+}
+
+body.light .searchBox input{
+
+background:#ececec;
+
+color:#111;
+
+}
+
+body.light .profileMenu button{
+
+background:#fff;
+
+color:#111;
+
+}
+
+body.light nav{
+
+background:#ffffffee;
+
+}
+
+body.light nav button{
+
+color:#555;
+
+}
+
+body.light nav button.active{
+
+color:#8b5cf6;
+
+}
+
+/* Responsive */
+
+@media(max-width:768px){
+
+.songGrid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.artistGrid{
+
+grid-template-columns:repeat(3,1fr);
+
+}
+
+.albumGrid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.coverDisc{
+
+width:240px;
+
+height:240px;
+
+}
+
+}
+
+@media(max-width:480px){
+
+.songGrid{
+
+grid-template-columns:1fr 1fr;
+
+gap:12px;
+
+}
+
+.horizontalList{
+
+gap:10px;
+
+}
+
+.songCard{
+
+min-width:145px;
+
+}
+
+.coverDisc{
+
+width:210px;
+
+height:210px;
+
+}
+
+header{
+
+padding:12px;
+
+}
+
+.logo h2{
+
+font-size:18px;
+
+}
+
+}
+
+/* Safe Area */
+
+body{
+
+padding-bottom:calc(95px + env(safe-area-inset-bottom));
+
+}
+
+/* Selection */
+
+::selection{
+
+background:#8b5cf6;
+
+color:#fff;
+
+}
+
+/* END */
